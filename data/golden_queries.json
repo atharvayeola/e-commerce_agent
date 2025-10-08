@@ -1,0 +1,14 @@
+[
+  {
+    "query": "Recommend me a t-shirt for sports under $40, size M",
+    "expected_attributes": ["t-shirt", "sports", "moisture wicking", "<=40", "M"]
+  },
+  {
+    "image_query": "sample_images/running_shoes_blue.jpg",
+    "expected_attributes": ["running", "blue"]
+  },
+  {
+    "smalltalk": "what's your name?",
+    "expected_reply_contains": ["CommerceAgent"]
+  }
+]

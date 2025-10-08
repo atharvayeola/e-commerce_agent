@@ -1,0 +1,50 @@
+[
+  {
+    "id": "prod_athletic_tee",
+    "title": "AeroFlex Athletic Tee",
+    "description": "Lightweight, moisture-wicking fabric ideal for training sessions.",
+    "brand": "AeroFlex",
+    "category": "t-shirt",
+    "price_cents": 3500,
+    "currency": "USD",
+    "sizes": ["S", "M", "L"],
+    "colors": ["black", "blue"],
+    "tags": ["sports", "moisture wicking", "breathable"],
+    "image_urls": ["https://example.com/images/aeroflex-tee.jpg"],
+    "rating": 4.6,
+    "num_reviews": 128,
+    "in_stock": true
+  },
+  {
+    "id": "prod_daily_tee",
+    "title": "Everyday Comfort Tee",
+    "description": "Soft cotton tee for everyday wear with relaxed fit.",
+    "brand": "ComfortCo",
+    "category": "t-shirt",
+    "price_cents": 2200,
+    "currency": "USD",
+    "sizes": ["M", "L", "XL"],
+    "colors": ["gray", "white"],
+    "tags": ["casual", "soft", "cotton"],
+    "image_urls": ["https://example.com/images/comfort-tee.jpg"],
+    "rating": 4.2,
+    "num_reviews": 87,
+    "in_stock": true
+  },
+  {
+    "id": "prod_running_shoe",
+    "title": "Strider Run Pro",
+    "description": "Responsive cushioning with breathable mesh upper.",
+    "brand": "Strider",
+    "category": "shoes",
+    "price_cents": 8900,
+    "currency": "USD",
+    "sizes": ["8", "9", "10", "11"],
+    "colors": ["blue", "white"],
+    "tags": ["running", "breathable", "lightweight"],
+    "image_urls": ["https://example.com/images/strider-run-pro.jpg"],
+    "rating": 4.8,
+    "num_reviews": 256,
+    "in_stock": true
+  }
+]
