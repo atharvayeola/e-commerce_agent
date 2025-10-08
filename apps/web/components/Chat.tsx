@@ -21,6 +21,8 @@ function createId() {
 export default function Chat({ onResponse }: { onResponse: (response: AgentResponse) => void }) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
+  const [webUrl, setWebUrl] = useState("");
+  const [allowWeb, setAllowWeb] = useState(false);
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -31,7 +33,7 @@ export default function Chat({ onResponse }: { onResponse: (response: AgentRespo
     setInput("");
     setLoading(true);
     try {
-      const response = await sendAgentMessage(userMessage.content);
+      const response = await sendAgentMessage(userMessage.content, undefined, webUrl || undefined, allowWeb);
       onResponse(response);
       const assistantMessage: ChatMessage = {
         id: createId(),
@@ -70,6 +72,17 @@ export default function Chat({ onResponse }: { onResponse: (response: AgentRespo
             placeholder="Ask for a running shoe under $100"
             className="flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-primary focus:outline-none"
           />
+          <input
+            type="text"
+            value={webUrl}
+            onChange={e => setWebUrl(e.target.value)}
+            placeholder="Optional: provide a web URL to use"
+            className="w-64 rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-primary focus:outline-none"
+          />
+          <label className="flex items-center gap-2 text-xs">
+            <input type="checkbox" checked={allowWeb} onChange={e => setAllowWeb(e.target.checked)} />
+            <span>Allow fetching web content</span>
+          </label>
           <button
             type="submit"
             disabled={loading}

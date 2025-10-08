@@ -23,7 +23,18 @@ export default function ProductGrid({ products }: { products: ProductCard[] }) {
           {product.image && (
             <img src={product.image} alt={product.title} className="h-40 w-full rounded-md object-cover" />
           )}
-          <h3 className="mt-3 text-base font-semibold text-slate-900">{product.title}</h3>
+          <div className="flex items-center justify-between">
+            {product.url ? (
+              <a href={product.url} target="_blank" rel="noreferrer" className="mt-3 text-base font-semibold text-slate-900 hover:underline">
+                {product.title}
+              </a>
+            ) : (
+              <h3 className="mt-3 text-base font-semibold text-slate-900">{product.title}</h3>
+            )}
+            {product.source && (
+              <span className="ml-2 rounded-full bg-slate-50 px-2 py-1 text-xs text-slate-600">{product.source}</span>
+            )}
+          </div>
           <p className="mt-1 text-sm text-slate-600">{formatPrice(product.price_cents, product.currency)}</p>
           {product.badges.length > 0 && (
             <div className="mt-2 flex flex-wrap gap-2">

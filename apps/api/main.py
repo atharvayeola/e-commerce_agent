@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 
-from .routers import agent, catalog, recommend
+from .routers import agent, catalog, recommend, prefetch
 
 app = FastAPI(title="Commerce Agent API", version="1.0.0")
 
@@ -33,6 +33,7 @@ def favicon() -> Response:
 app.include_router(catalog.router, prefix="/catalog", tags=["catalog"])
 app.include_router(recommend.router, prefix="", tags=["recommend"])
 app.include_router(agent.router, prefix="/agent", tags=["agent"])
+app.include_router(prefetch.router, prefix="/admin", tags=["admin"])
 
 
 @app.get("/healthz")

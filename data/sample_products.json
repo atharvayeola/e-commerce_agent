@@ -47,4 +47,21 @@
     "num_reviews": 256,
     "in_stock": true
   }
+  ,
+  {
+    "id": "prod_blender_1000",
+    "title": "TurboBlend 1000",
+    "description": "High-power kitchen blender with stainless steel blades and multiple speed settings.",
+    "brand": "KitchenPro",
+    "category": "home-appliance",
+    "price_cents": 12999,
+    "currency": "USD",
+    "sizes": [],
+    "colors": ["silver", "black"],
+    "tags": ["kitchen", "blender", "appliance"],
+    "image_urls": ["https://example.com/images/turboblend-1000.jpg"],
+    "rating": 4.5,
+    "num_reviews": 42,
+    "in_stock": true
+  }
 ]

@@ -54,6 +54,8 @@ class SearchResponse(BaseModel):
 class AgentChatRequest(BaseModel):
     message: str
     image_b64: Optional[str] = None
+    web_url: Optional[HttpUrl] = None
+    allow_web: Optional[bool] = False
     session_id: Optional[str] = None
     user_context: Optional[dict] = None
 

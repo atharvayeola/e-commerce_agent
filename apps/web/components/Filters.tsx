@@ -6,7 +6,18 @@ const QUICK_FILTERS = [
   "Under $50",
   "Running",
   "Black",
-  "Size M"
+  "Size M",
+  // broader/general filters
+  "Casual",
+  "Formal",
+  "Sneakers",
+  "Sandals",
+  "Boots",
+  "Women",
+  "Men",
+  "Unisex",
+  "Sale",
+  "New Arrivals"
 ];
 
 export default function Filters({ onSelect }: { onSelect: (chip: string) => void }) {

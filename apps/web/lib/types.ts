@@ -6,6 +6,8 @@ export type ProductCard = {
   currency: string;
   badges: string[];
   rationale?: string | null;
+  source?: "web" | "catalog" | string;
+  url?: string | null;
 };
 
 export type AgentResponse = {

@@ -6,7 +6,7 @@ import Filters from "../components/Filters";
 import ImageDropzone from "../components/ImageDropzone";
 import ProductGrid from "../components/ProductGrid";
 import { AgentResponse, ProductCard } from "../lib/types";
-import { sendAgentMessage } from "../lib/agentClient";
+import { sendAgentMessage, sendRecommend } from "../lib/agentClient";
 
 export default function HomePage() {
   const [products, setProducts] = useState<ProductCard[]>([]);
@@ -21,8 +21,32 @@ export default function HomePage() {
   async function handleFilterSelect(chip: string) {
     try {
       setLoading(true);
-      const response = await sendAgentMessage(chip);
-      handleResponse(response);
+      // Map chip to a structured recommend call when possible
+      const mapping: Record<string, { goal: string; constraints?: any }> = {
+        "Under $50": { goal: "affordable products", constraints: { price_max: 5000 } },
+        Running: { goal: "running shoes", constraints: { category: "shoes" } },
+        Black: { goal: "black products", constraints: { color: ["black"] } },
+        "Size M": { goal: "size M", constraints: { size: ["M"] } },
+        Casual: { goal: "casual shoes" },
+        Formal: { goal: "formal shoes" },
+        Sneakers: { goal: "sneakers" },
+        Sandals: { goal: "sandals" },
+        Boots: { goal: "boots" },
+        Women: { goal: "products for women" },
+        Men: { goal: "products for men" },
+        Unisex: { goal: "unisex products" },
+        Sale: { goal: "on sale" },
+        "New Arrivals": { goal: "new arrivals" },
+      };
+
+      if (mapping[chip]) {
+        const payload = mapping[chip];
+        const resp = await sendRecommend(payload.goal, payload.constraints ?? null, 8);
+        setProducts(resp.results || []);
+      } else {
+        const response = await sendAgentMessage(chip);
+        handleResponse(response);
+      }
     } finally {
       setLoading(false);
     }
