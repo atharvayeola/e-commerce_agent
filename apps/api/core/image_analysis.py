@@ -6,12 +6,17 @@ import base64
 import io
 import math
 from dataclasses import dataclass, asdict
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 try:  # Pillow is an optional dependency for richer image search
     from PIL import Image
 except Exception:  # pragma: no cover - gracefully degrade when Pillow missing
     Image = None  # type: ignore
+
+try:  # Lightweight vision transformer for semantic labels
+    from transformers import pipeline  # type: ignore
+except Exception:  # pragma: no cover - allow running without transformers
+    pipeline = None  # type: ignore
 
 
 @dataclass
@@ -23,6 +28,7 @@ class ImageAnalysis:
     brightness: float
     aspect_ratio: float
     notes: List[str]
+    detected_objects: List[str]
 
     def to_dict(self) -> Dict:
         data = asdict(self)
@@ -61,6 +67,52 @@ def _nearest_color(rgb: Tuple[int, int, int]) -> str:
             best = name
             best_dist = dist
     return best or "unknown"
+
+_CLASSIFIER: Optional[Any] = None
+_CLASSIFIER_DISABLED = object()
+
+
+def _object_labels(image: "Image.Image") -> List[str]:  # type: ignore[name-defined]
+    """Return high-confidence labels detected by a ViT classifier."""
+
+    global _CLASSIFIER
+    if pipeline is None:
+        return []
+
+    if _CLASSIFIER is _CLASSIFIER_DISABLED:
+        return []
+
+    if _CLASSIFIER is None:
+        try:
+            _CLASSIFIER = pipeline(
+                "image-classification",
+                model="google/vit-base-patch16-224",
+                top_k=5,
+            )
+        except Exception:
+            _CLASSIFIER = _CLASSIFIER_DISABLED
+            return []
+
+    if _CLASSIFIER is _CLASSIFIER_DISABLED or _CLASSIFIER is None:
+        return []
+
+    try:
+        predictions = _CLASSIFIER(image)  # type: ignore[misc]
+    except Exception:
+        return []
+
+    labels: List[str] = []
+    for item in predictions:
+        if not isinstance(item, dict):
+            continue
+        label = item.get("label")
+        score = item.get("score", 0)
+        if not label:
+            continue
+        if score is not None and score < 0.08:
+            continue
+        labels.append(str(label))
+    return labels
 
 
 def _decode_image(image_b64: str) -> Optional[Image.Image]:  # type: ignore[name-defined]
@@ -108,12 +160,17 @@ def analyze_image(image_b64: str) -> Optional[ImageAnalysis]:
     elif aspect_ratio < 0.75:
         notes.append("taller_than_wide")
 
+    detected_objects = _object_labels(img)
+    if detected_objects:
+        notes.append(f"maybe_{detected_objects[0]}")
+
     return ImageAnalysis(
         dominant_colors=top_colors,
         average_color=avg,
         brightness=brightness,
         aspect_ratio=aspect_ratio,
         notes=notes,
+        detected_objects=detected_objects,
     )
 
 

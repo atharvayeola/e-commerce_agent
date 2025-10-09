@@ -5,5 +5,6 @@ python-multipart==0.0.9
 requests==2.31.0
 beautifulsoup4==4.12.2
 Pillow
+transformers==4.42.4
 httpx==0.27.0
 # readability-lxml and lxml were removed because they require C extensions on macOS

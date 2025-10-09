@@ -15,15 +15,14 @@ from ..core.llm_adapter import summarize_text
 from ..core.web_fetch import fetch_and_extract, to_product_card
 from ..core.web_search import search as web_search
 from ..core.browseai_adapter import fetch_from_browseai
+from ..core.image_analysis import analyze_image
 
 from ..schemas import (
     AgentChatRequest,
     AgentChatResponse,
-    ImageSearchRequest,
     ProductCard,
     RecommendRequest,
 )
-from .catalog import image_search
 from .recommend import recommend_products
 
 
@@ -166,25 +165,45 @@ def chat(request: AgentChatRequest) -> AgentChatResponse:
         )
 
     if intent == "image_search":
-        image_payload = ImageSearchRequest(
-            image_b64=request.image_b64 or "",
-            query=request.message or None,
-            filters=None,
-            limit=6,
-        )
-        response = image_search(image_payload)
-        analysis = {}
-        if isinstance(response.debug, dict):
-            analysis = response.debug.get("image_analysis") or {}
-        colors = [c for c in analysis.get("dominant_colors", []) if c]
-        if colors:
-            color_phrase = ", ".join(colors[:2])
-            text = f"I looked for catalog items that match the {color_phrase} tones in your photo."
+        analysis = analyze_image(request.image_b64 or "") if request.image_b64 else None
+        color_terms = [c for c in (analysis.dominant_colors if analysis else []) if c]
+        object_terms = [o for o in (analysis.detected_objects if analysis else []) if o]
+
+        query_parts: List[str] = []
+        if request.message and request.message.strip():
+            query_parts.append(request.message.strip())
+        if object_terms:
+            natural = [term.replace("_", " ") for term in object_terms[:2]]
+            query_parts.append(" ".join(natural))
+        if color_terms:
+            query_parts.append(" ".join(color_terms[:3]) + " product")
+        if not query_parts:
+            query_parts.append("shopping inspiration")
+
+        web_cards = _web_product_cards(" ".join(query_parts), limit=_WEB_SEARCH_LIMIT)
+
+        descriptors: List[str] = []
+        if color_terms:
+            descriptors.append(f"the {', '.join(color_terms[:2])} palette")
+        if object_terms:
+            descriptors.append(f"what looks like {object_terms[0].replace('_', ' ')}")
+        if analysis and "mostly_dark" in analysis.notes:
+            descriptors.append("the darker lighting in your photo")
+        elif analysis and "mostly_light" in analysis.notes:
+            descriptors.append("the lighter tones in your photo")
+        if not descriptors:
+            descriptors.append("the overall look of your image")
+
+        if web_cards:
+            text = (
+                "I searched the web for products that match "
+                + (" and ".join(descriptors) if len(descriptors) > 1 else descriptors[0])
+                + "."
+            )
         else:
-            text = "Here are products that visually align with your request."
-        if not response.results:
-            text = "I couldn't find a close visual match, so here are some popular catalog picks instead."
-        return AgentChatResponse(intent=intent, text=text, products=response.results)
+            text = "I couldn't find clear web matches for that image. Try adding a short description?"
+
+        return AgentChatResponse(intent=intent, text=text, products=web_cards)
 
     limit = _WEB_SEARCH_LIMIT
     web_cards: List[ProductCard] = []
