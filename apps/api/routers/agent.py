@@ -202,7 +202,8 @@ def chat(request: AgentChatRequest) -> AgentChatResponse:
             import os
 
             api_key = os.environ.get("BROWSEAI_API_KEY")
-        items = fetch_from_browseai(str(request.browse_extractor), api_key) if api_key else None
+        force_browse = bool(getattr(request, "browse_force", False))
+        items = fetch_from_browseai(str(request.browse_extractor), api_key, force=force_browse) if api_key else None
         if items:
             from pydantic import ValidationError
 

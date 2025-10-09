@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import os
 import json
 import logging
 from pathlib import Path
@@ -31,8 +32,12 @@ def fetch_from_browseai(extractor_id: str, api_key: str, force: bool = False) ->
     cache_path = _cache_path_for_key(extractor_id + api_key)
     if cache_path.exists() and not force:
         try:
+            if os.environ.get("BROWSEAI_DEBUG"):
+                logging.info("browse.ai cache hit for extractor=%s", extractor_id)
             return json.loads(cache_path.read_text())
         except Exception:
+            if os.environ.get("BROWSEAI_DEBUG"):
+                logging.exception("browse.ai failed reading cache for extractor=%s", extractor_id)
             pass
 
     # Build the API call. Browse.ai's API expects the API key in the header
@@ -43,11 +48,16 @@ def fetch_from_browseai(extractor_id: str, api_key: str, force: bool = False) ->
     run_url = f"{base}/extractors/{extractor_id}/run"
 
     headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+    debug_enabled = bool(os.environ.get("BROWSEAI_DEBUG"))
     try:
         # Trigger a run
+        if debug_enabled:
+            logging.info("browse.ai POST %s", run_url)
         resp = requests.post(run_url, headers=headers, timeout=10)
         resp.raise_for_status()
         data = resp.json()
+        if debug_enabled:
+            logging.info("browse.ai run response top-level keys: %s", list(data.keys()) if isinstance(data, dict) else type(data))
 
         # The run response may include a `run_id` or immediate `results`.
         results = None
@@ -58,10 +68,14 @@ def fetch_from_browseai(extractor_id: str, api_key: str, force: bool = False) ->
             if not results and run_id:
                 poll_url = f"{base}/runs/{run_id}"
                 # naive polling
-                for _ in range(10):
+                for attempt in range(10):
+                    if debug_enabled:
+                        logging.info("browse.ai polling (%s) %s", attempt + 1, poll_url)
                     r2 = requests.get(poll_url, headers=headers, timeout=10)
                     if r2.status_code == 200:
                         j = r2.json()
+                        if debug_enabled:
+                            logging.info("browse.ai poll keys: %s", list(j.keys()) if isinstance(j, dict) else type(j))
                         results = j.get("results") or j.get("items") or j.get("data")
                         if results:
                             break
@@ -69,7 +83,7 @@ def fetch_from_browseai(extractor_id: str, api_key: str, force: bool = False) ->
             results = data
 
         if not results:
-            logging.warning("browse.ai: no results for extractor %s", extractor_id)
+            logging.warning("browse.ai: no results for extractor %s (keys seen=%s)", extractor_id, list(data.keys()) if isinstance(data, dict) else type(data))
             return None
 
         normalized = []
@@ -134,7 +148,11 @@ def fetch_from_browseai(extractor_id: str, api_key: str, force: bool = False) ->
                 }
             )
 
-        cache_path.write_text(json.dumps(normalized))
+        try:
+            cache_path.write_text(json.dumps(normalized))
+        except Exception:
+            if debug_enabled:
+                logging.exception("browse.ai failed writing cache %s", cache_path)
         return normalized
     except Exception as exc:
         logging.exception("Error calling browse.ai extractor %s: %s", extractor_id, exc)

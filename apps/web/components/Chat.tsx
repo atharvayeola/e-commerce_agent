@@ -4,7 +4,7 @@
 import { FormEvent, useState } from "react";
 import { AgentResponse, ProductCard } from "../lib/types";
 import { sendAgentMessage } from "../lib/agentClient";
-import { DEFAULT_BROWSE_AI_API_KEY, DEFAULT_BROWSE_AI_EXTRACTOR } from "/Users/ayeola/Downloads/test_agent/apps/web/lib/config";
+import { DEFAULT_BROWSE_AI_EXTRACTOR } from "/Users/ayeola/Downloads/test_agent/apps/web/lib/config";
 import { PriceRange } from "./Filters";
 
 export type ChatMessage = {
@@ -25,7 +25,7 @@ export default function Chat({ onResponse }: { onResponse: (response: AgentRespo
   const [input, setInput] = useState("");
   const [webUrl, setWebUrl] = useState("");
   const [loading, setLoading] = useState(false);
-  const browseConfigured = Boolean(DEFAULT_BROWSE_AI_EXTRACTOR && DEFAULT_BROWSE_AI_API_KEY);
+  const browseConfigured = Boolean(DEFAULT_BROWSE_AI_EXTRACTOR);
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const trimmedMessage = input.trim();
@@ -117,8 +117,8 @@ export default function Chat({ onResponse }: { onResponse: (response: AgentRespo
           />
           <p className="text-xs text-slate-400">
             {browseConfigured
-              ? "Live web products via Browse.ai are enabled when available."
-              : "Add a Browse.ai extractor ID and API key to enable live product scraping."}
+              ? "Browse.ai extractor configured. API key is managed server-side."
+              : "Set NEXT_PUBLIC_BROWSE_AI_EXTRACTOR_ID (frontend) and BROWSEAI_API_KEY (backend) to enable Browse.ai."}
           </p>
         </div>
       </form>

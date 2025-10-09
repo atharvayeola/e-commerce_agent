@@ -95,6 +95,8 @@ Notes:
 - WEB_FETCH_ALLOW_ALL (dev override): set to `1` to allow fetching from all domains (use only in dev!)
 - HF_TOKEN (optional): Hugging Face token if you want `llm_adapter` to call a real HF model for page summarization; otherwise a deterministic mock summary is used.
 - NEXT_PUBLIC_API_BASE: frontend env var to point the Next client at the API server.
+- BROWSEAI_API_KEY: backend-only secret for Browse.ai extractor runs (DO NOT expose to frontend).
+- NEXT_PUBLIC_BROWSE_AI_EXTRACTOR_ID: optional extractor id exposed to the frontend to enable Browse.ai integration (leave blank to disable). The frontend never sends the API key now; the backend reads `BROWSEAI_API_KEY` directly.
 
 ---
 

@@ -1,4 +1,4 @@
-import { DEFAULT_BROWSE_AI_API_KEY, DEFAULT_BROWSE_AI_EXTRACTOR } from "./config";
+import { DEFAULT_BROWSE_AI_EXTRACTOR } from "./config";
 import { AgentResponse } from "./types";
 
 // The backend exposes endpoints at the root (e.g. http://localhost:8000/agent/chat).
@@ -27,13 +27,7 @@ export async function sendAgentMessage(
       : DEFAULT_BROWSE_AI_EXTRACTOR;
   if (extractor) {
     body.browse_extractor = extractor;
-    const apiKey =
-      options.browse_api_key !== undefined
-        ? options.browse_api_key
-        : DEFAULT_BROWSE_AI_API_KEY;
-    if (apiKey) {
-      body.browse_api_key = apiKey;
-    }
+    // No API key forwarded from client; backend will read BROWSEAI_API_KEY.
   }
 
   const response = await fetch(`${API_BASE}/agent/chat`, {

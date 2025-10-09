@@ -11,6 +11,12 @@ dist/
 pgdata/
 .DS_Store
 
+# Runtime caches and logs
+apps/data/web_cache/
+uvicorn.log
+browse_debug.log
+uvicorn.pid
+
 # Python virtual environment
 agent_env/
 .env/

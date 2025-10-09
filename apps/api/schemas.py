@@ -68,6 +68,8 @@ class AgentChatRequest(BaseModel):
     browse_extractor: Optional[str] = None
     # optional: allow passing a short-lived browse.ai api key in the request
     browse_api_key: Optional[str] = None
+    # force a fresh browse.ai run (bypass cache) when true
+    browse_force: Optional[bool] = False
     session_id: Optional[str] = None
     user_context: Optional[dict] = None
 
