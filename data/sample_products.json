@@ -1,67 +1,1266 @@
 [
   {
-    "id": "prod_athletic_tee",
-    "title": "AeroFlex Athletic Tee",
-    "description": "Lightweight, moisture-wicking fabric ideal for training sessions.",
-    "brand": "AeroFlex",
-    "category": "t-shirt",
-    "price_cents": 3500,
-    "currency": "USD",
-    "sizes": ["S", "M", "L"],
-    "colors": ["black", "blue"],
-    "tags": ["sports", "moisture wicking", "breathable"],
-    "image_urls": ["https://example.com/images/aeroflex-tee.jpg"],
-    "rating": 4.6,
-    "num_reviews": 128,
-    "in_stock": true
-  },
-  {
-    "id": "prod_daily_tee",
-    "title": "Everyday Comfort Tee",
-    "description": "Soft cotton tee for everyday wear with relaxed fit.",
-    "brand": "ComfortCo",
-    "category": "t-shirt",
-    "price_cents": 2200,
-    "currency": "USD",
-    "sizes": ["M", "L", "XL"],
-    "colors": ["gray", "white"],
-    "tags": ["casual", "soft", "cotton"],
-    "image_urls": ["https://example.com/images/comfort-tee.jpg"],
-    "rating": 4.2,
-    "num_reviews": 87,
-    "in_stock": true
-  },
-  {
-    "id": "prod_running_shoe",
-    "title": "Strider Run Pro",
-    "description": "Responsive cushioning with breathable mesh upper.",
-    "brand": "Strider",
-    "category": "shoes",
-    "price_cents": 8900,
-    "currency": "USD",
-    "sizes": ["8", "9", "10", "11"],
-    "colors": ["blue", "white"],
-    "tags": ["running", "breathable", "lightweight"],
-    "image_urls": ["https://example.com/images/strider-run-pro.jpg"],
-    "rating": 4.8,
-    "num_reviews": 256,
-    "in_stock": true
-  }
-  ,
-  {
-    "id": "prod_blender_1000",
-    "title": "TurboBlend 1000",
-    "description": "High-power kitchen blender with stainless steel blades and multiple speed settings.",
-    "brand": "KitchenPro",
-    "category": "home-appliance",
-    "price_cents": 12999,
+    "id": "prod_aurora_headphones",
+    "title": "AuroraSound Noise-Cancelling Headphones",
+    "description": "Wireless over-ear headphones with hybrid noise cancellation and 30-hour battery life.",
+    "brand": "AuroraSound",
+    "category": "electronics",
+    "price_cents": 27900,
     "currency": "USD",
     "sizes": [],
-    "colors": ["silver", "black"],
-    "tags": ["kitchen", "blender", "appliance"],
-    "image_urls": ["https://example.com/images/turboblend-1000.jpg"],
+    "colors": [
+      "black",
+      "silver"
+    ],
+    "tags": [
+      "bluetooth",
+      "noise cancelling",
+      "over-ear"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.8,
+    "num_reviews": 542,
+    "in_stock": true
+  },
+  {
+    "id": "prod_lumina_tablet",
+    "title": "Lumina 11-inch Productivity Tablet",
+    "description": "Slim aluminum tablet with vivid LiquidCrystal display and detachable keyboard support.",
+    "brand": "Lumina",
+    "category": "electronics",
+    "price_cents": 64900,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "gray"
+    ],
+    "tags": [
+      "tablet",
+      "touchscreen",
+      "productivity"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.6,
+    "num_reviews": 318,
+    "in_stock": true
+  },
+  {
+    "id": "prod_vector_smartwatch",
+    "title": "VectorPulse GPS Smartwatch",
+    "description": "Rugged GPS smartwatch with heart-rate tracking and week-long battery endurance.",
+    "brand": "VectorPulse",
+    "category": "electronics",
+    "price_cents": 32900,
+    "currency": "USD",
+    "sizes": [
+      "S",
+      "M",
+      "L"
+    ],
+    "colors": [
+      "charcoal",
+      "orange"
+    ],
+    "tags": [
+      "fitness",
+      "gps",
+      "smartwatch"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1512499617640-c2f999098c33?auto=format&fit=crop&w=800&q=80"
+    ],
     "rating": 4.5,
-    "num_reviews": 42,
+    "num_reviews": 204,
+    "in_stock": true
+  },
+  {
+    "id": "prod_nebula_speaker",
+    "title": "Nebula Smart Home Speaker",
+    "description": "Voice-enabled speaker with room-filling 360\u00b0 sound and ambient light halo.",
+    "brand": "Nebula",
+    "category": "electronics",
+    "price_cents": 18900,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "white"
+    ],
+    "tags": [
+      "smart home",
+      "speaker",
+      "voice assistant"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1523473827534-86c45e7e1d99?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.4,
+    "num_reviews": 167,
+    "in_stock": true
+  },
+  {
+    "id": "prod_quartz_monitor",
+    "title": "QuartzView 27\" 4K Monitor",
+    "description": "Ultra HD IPS display with 99% sRGB coverage and USB-C single-cable connectivity.",
+    "brand": "QuartzView",
+    "category": "electronics",
+    "price_cents": 45900,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "black"
+    ],
+    "tags": [
+      "monitor",
+      "4k",
+      "usb-c"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1484704849700-f032a568e944?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.7,
+    "num_reviews": 294,
+    "in_stock": true
+  },
+  {
+    "id": "prod_puremist_humidifier",
+    "title": "PureMist Ultrasonic Humidifier",
+    "description": "Quiet cool-mist humidifier with nightlight glow and auto-shutoff timer.",
+    "brand": "PureMist",
+    "category": "home-appliance",
+    "price_cents": 6900,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "white",
+      "blue"
+    ],
+    "tags": [
+      "humidifier",
+      "bedroom",
+      "ultrasonic"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1581578731548-c64695cc6955?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.3,
+    "num_reviews": 112,
+    "in_stock": true
+  },
+  {
+    "id": "prod_breezeair_purifier",
+    "title": "BreezeAir HEPA Purifier",
+    "description": "Three-stage HEPA filtration captures allergens and neutralizes household odors.",
+    "brand": "BreezeAir",
+    "category": "home-appliance",
+    "price_cents": 22900,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "white",
+      "silver"
+    ],
+    "tags": [
+      "air purifier",
+      "hepa",
+      "smart"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1504196606672-aef5c9cefc92?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.6,
+    "num_reviews": 321,
+    "in_stock": true
+  },
+  {
+    "id": "prod_solstice_spaceheater",
+    "title": "Solstice Ceramic Space Heater",
+    "description": "Compact heater with digital thermostat, oscillation, and tip-over protection.",
+    "brand": "Solstice",
+    "category": "home-appliance",
+    "price_cents": 8900,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "white",
+      "gray"
+    ],
+    "tags": [
+      "heater",
+      "ceramic",
+      "safety"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1573883430576-75940943a1b5?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.2,
+    "num_reviews": 98,
+    "in_stock": true
+  },
+  {
+    "id": "prod_glide_pro_iron",
+    "title": "GlidePro Steam Iron",
+    "description": "High-steam stainless steel iron with precision tip and anti-drip reservoir.",
+    "brand": "GlidePro",
+    "category": "home-appliance",
+    "price_cents": 4900,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "blue",
+      "white"
+    ],
+    "tags": [
+      "iron",
+      "steam",
+      "garment care"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1581579186988-5b0e7f1b390b?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.1,
+    "num_reviews": 76,
+    "in_stock": true
+  },
+  {
+    "id": "prod_orbit_robotvac",
+    "title": "OrbitClean Robot Vacuum",
+    "description": "Self-charging robot vacuum with lidar mapping and multi-surface brush roll.",
+    "brand": "OrbitClean",
+    "category": "home-appliance",
+    "price_cents": 37900,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "black"
+    ],
+    "tags": [
+      "robot vacuum",
+      "smart home",
+      "cleaning"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.5,
+    "num_reviews": 412,
+    "in_stock": true
+  },
+  {
+    "id": "prod_hearth_castskillet",
+    "title": "HearthStone Cast Iron Skillet",
+    "description": "Pre-seasoned 12-inch cast iron skillet for stove, oven, or campfire cooking.",
+    "brand": "HearthStone",
+    "category": "kitchenware",
+    "price_cents": 4200,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "black"
+    ],
+    "tags": [
+      "cast iron",
+      "cookware",
+      "skillet"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1481277542470-605612bd2d61?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.9,
+    "num_reviews": 658,
+    "in_stock": true
+  },
+  {
+    "id": "prod_cascade_chefknife",
+    "title": "Cascade 8\" Chef's Knife",
+    "description": "Forged stainless steel chef's knife with full-tang handle and 15\u00b0 edge.",
+    "brand": "Cascade",
+    "category": "kitchenware",
+    "price_cents": 11900,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "silver",
+      "black"
+    ],
+    "tags": [
+      "knife",
+      "chef",
+      "forged"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1505935428862-770b6f24f629?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.7,
+    "num_reviews": 245,
+    "in_stock": true
+  },
+  {
+    "id": "prod_verve_coffeegrinder",
+    "title": "Verve Burr Coffee Grinder",
+    "description": "Precision burr grinder with 40 grind settings and anti-static grounds bin.",
+    "brand": "Verve",
+    "category": "kitchenware",
+    "price_cents": 15900,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "black",
+      "silver"
+    ],
+    "tags": [
+      "coffee",
+      "grinder",
+      "espresso"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1495521821757-a1efb6729352?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.6,
+    "num_reviews": 183,
+    "in_stock": true
+  },
+  {
+    "id": "prod_lumen_ceramicset",
+    "title": "Lumen Porcelain Dinner Set",
+    "description": "16-piece porcelain dinnerware set with satin glaze and stackable profile.",
+    "brand": "Lumen",
+    "category": "kitchenware",
+    "price_cents": 12900,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "white"
+    ],
+    "tags": [
+      "dinnerware",
+      "porcelain",
+      "tabletop"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1524592094714-0f0654e20314?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.5,
+    "num_reviews": 156,
+    "in_stock": true
+  },
+  {
+    "id": "prod_pulse_sousvide",
+    "title": "Pulse Precision Sous Vide",
+    "description": "Wi-Fi enabled immersion circulator for precise low-temperature cooking.",
+    "brand": "PulseChef",
+    "category": "kitchenware",
+    "price_cents": 19900,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "black",
+      "silver"
+    ],
+    "tags": [
+      "sous vide",
+      "precision",
+      "cooking"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1528715471579-d1bcf0ba5e83?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.4,
+    "num_reviews": 137,
+    "in_stock": true
+  },
+  {
+    "id": "prod_trailblaze_backpack",
+    "title": "Trailblaze 45L Hiking Backpack",
+    "description": "Weather-resistant hiking pack with ventilated back panel and hydration sleeve.",
+    "brand": "Trailblaze",
+    "category": "outdoor",
+    "price_cents": 15900,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "green",
+      "gray"
+    ],
+    "tags": [
+      "backpack",
+      "hiking",
+      "outdoor"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.8,
+    "num_reviews": 287,
+    "in_stock": true
+  },
+  {
+    "id": "prod_aerolite_tent",
+    "title": "AeroLite Ultralight Tent",
+    "description": "Two-person ultralight backpacking tent with quick-pitch pole system.",
+    "brand": "AeroLite",
+    "category": "outdoor",
+    "price_cents": 24900,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "orange",
+      "gray"
+    ],
+    "tags": [
+      "tent",
+      "camping",
+      "ultralight"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.6,
+    "num_reviews": 198,
+    "in_stock": true
+  },
+  {
+    "id": "prod_summit_campstove",
+    "title": "Summit Portable Camp Stove",
+    "description": "Compact dual-burner stove with simmer control and wind-block panels.",
+    "brand": "Summit",
+    "category": "outdoor",
+    "price_cents": 12900,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "green",
+      "silver"
+    ],
+    "tags": [
+      "camp stove",
+      "propane",
+      "outdoor cooking"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.3,
+    "num_reviews": 154,
+    "in_stock": true
+  },
+  {
+    "id": "prod_ridge_insulatedbottle",
+    "title": "Ridge Stainless Insulated Bottle",
+    "description": "32-ounce insulated bottle keeps drinks cold for 24 hours or hot for 12.",
+    "brand": "Ridge",
+    "category": "outdoor",
+    "price_cents": 3800,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "blue",
+      "black"
+    ],
+    "tags": [
+      "bottle",
+      "hydration",
+      "insulated"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1526402464815-75a6dd15799a?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.7,
+    "num_reviews": 344,
+    "in_stock": true
+  },
+  {
+    "id": "prod_lantern_glow",
+    "title": "GlowTrail Rechargeable Lantern",
+    "description": "Rechargeable LED lantern with warm white and amber night modes.",
+    "brand": "GlowTrail",
+    "category": "outdoor",
+    "price_cents": 6200,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "black",
+      "yellow"
+    ],
+    "tags": [
+      "lantern",
+      "led",
+      "camping"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1500740516770-92bd004b996e?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.4,
+    "num_reviews": 129,
+    "in_stock": true
+  },
+  {
+    "id": "prod_corebalance_mat",
+    "title": "CoreBalance Yoga Mat",
+    "description": "Non-slip yoga mat with dual-layer cushioning and alignment guide.",
+    "brand": "CoreBalance",
+    "category": "fitness",
+    "price_cents": 4500,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "teal",
+      "gray"
+    ],
+    "tags": [
+      "yoga",
+      "mat",
+      "fitness"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1599058917212-d750089bc07c?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.6,
+    "num_reviews": 204,
+    "in_stock": true
+  },
+  {
+    "id": "prod_stridelite_shoes",
+    "title": "StrideLite Running Shoes",
+    "description": "Breathable running shoes with responsive foam midsole and reflective accents.",
+    "brand": "StrideLite",
+    "category": "fitness",
+    "price_cents": 12900,
+    "currency": "USD",
+    "sizes": [
+      "7",
+      "8",
+      "9",
+      "10",
+      "11"
+    ],
+    "colors": [
+      "blue",
+      "white"
+    ],
+    "tags": [
+      "running",
+      "shoes",
+      "lightweight"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1517832207067-4db24a2ae47c?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.7,
+    "num_reviews": 389,
+    "in_stock": true
+  },
+  {
+    "id": "prod_kinetic_dumbbells",
+    "title": "Kinetic Adjustable Dumbbells",
+    "description": "Adjustable dumbbell pair ranging from 5 to 52.5 pounds with quick-select dial.",
+    "brand": "Kinetic",
+    "category": "fitness",
+    "price_cents": 29900,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "black",
+      "red"
+    ],
+    "tags": [
+      "strength",
+      "weights",
+      "adjustable"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1556817411-31ae72fa3ea0?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.5,
+    "num_reviews": 241,
+    "in_stock": true
+  },
+  {
+    "id": "prod_pulse_hrmonitor",
+    "title": "PulseTrack Heart Rate Monitor",
+    "description": "Chest strap heart rate monitor with ANT+ and Bluetooth connectivity.",
+    "brand": "PulseTrack",
+    "category": "fitness",
+    "price_cents": 7900,
+    "currency": "USD",
+    "sizes": [
+      "M",
+      "L"
+    ],
+    "colors": [
+      "black"
+    ],
+    "tags": [
+      "heart rate",
+      "wearable",
+      "training"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1546484396-fb3fc6f7eab5?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.3,
+    "num_reviews": 132,
+    "in_stock": true
+  },
+  {
+    "id": "prod_resistance_bandset",
+    "title": "FlexForce Resistance Band Set",
+    "description": "Set of five color-coded resistance bands with door anchor and ankle straps.",
+    "brand": "FlexForce",
+    "category": "fitness",
+    "price_cents": 3200,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "multi"
+    ],
+    "tags": [
+      "resistance bands",
+      "home gym",
+      "mobility"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1517963879433-6ad2b056d712?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.4,
+    "num_reviews": 175,
+    "in_stock": true
+  },
+  {
+    "id": "prod_auraglow_serum",
+    "title": "AuraGlow Vitamin C Serum",
+    "description": "Brightening vitamin C serum with hyaluronic acid for daily radiance.",
+    "brand": "AuraGlow",
+    "category": "beauty",
+    "price_cents": 3600,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "orange"
+    ],
+    "tags": [
+      "skincare",
+      "vitamin c",
+      "serum"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.7,
+    "num_reviews": 518,
+    "in_stock": true
+  },
+  {
+    "id": "prod_silkveil_moisturizer",
+    "title": "SilkVeil Hydrating Moisturizer",
+    "description": "Lightweight gel moisturizer with ceramides and aloe for lasting hydration.",
+    "brand": "SilkVeil",
+    "category": "beauty",
+    "price_cents": 2900,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "white"
+    ],
+    "tags": [
+      "skincare",
+      "moisturizer",
+      "hydrating"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1522337660859-02fbefca4702?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.5,
+    "num_reviews": 264,
+    "in_stock": true
+  },
+  {
+    "id": "prod_zenaroma_diffuser",
+    "title": "ZenAroma Essential Oil Diffuser",
+    "description": "Ultrasonic diffuser with woodgrain finish and eight soothing light modes.",
+    "brand": "ZenAroma",
+    "category": "beauty",
+    "price_cents": 4200,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "wood",
+      "white"
+    ],
+    "tags": [
+      "aromatherapy",
+      "diffuser",
+      "wellness"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.6,
+    "num_reviews": 198,
+    "in_stock": true
+  },
+  {
+    "id": "prod_velvet_eyeshadow",
+    "title": "VelvetMuse Eyeshadow Palette",
+    "description": "Twelve-shade eyeshadow palette with matte and shimmer neutrals.",
+    "brand": "VelvetMuse",
+    "category": "beauty",
+    "price_cents": 2600,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "multi"
+    ],
+    "tags": [
+      "makeup",
+      "eyeshadow",
+      "palette"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.4,
+    "num_reviews": 149,
+    "in_stock": true
+  },
+  {
+    "id": "prod_clearrain_cleansing",
+    "title": "ClearRain Gel Cleanser",
+    "description": "Gentle foaming cleanser with willow bark extract for balanced skin.",
+    "brand": "ClearRain",
+    "category": "beauty",
+    "price_cents": 2200,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "blue"
+    ],
+    "tags": [
+      "cleanser",
+      "skincare",
+      "gentle"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1522337094841-8ebc0c46f227?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.3,
+    "num_reviews": 176,
+    "in_stock": true
+  },
+  {
+    "id": "prod_starlink_blocks",
+    "title": "StarLink Magnetic Blocks",
+    "description": "60-piece magnetic construction set that encourages open-ended STEM play.",
+    "brand": "StarLink",
+    "category": "toys",
+    "price_cents": 4900,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "multi"
+    ],
+    "tags": [
+      "stem",
+      "building",
+      "magnetic"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1506765515384-028b60a970df?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.8,
+    "num_reviews": 352,
+    "in_stock": true
+  },
+  {
+    "id": "prod_rover_bot",
+    "title": "Rover Explorer Coding Robot",
+    "description": "Programmable rover robot with drag-and-drop coding app and sensors.",
+    "brand": "RoverLabs",
+    "category": "toys",
+    "price_cents": 8900,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "white",
+      "orange"
+    ],
+    "tags": [
+      "robot",
+      "coding",
+      "stem"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.6,
+    "num_reviews": 223,
+    "in_stock": true
+  },
+  {
+    "id": "prod_canvas_craftkit",
+    "title": "Canvas Creators Art Kit",
+    "description": "All-in-one craft kit with canvases, paints, and brushes for budding artists.",
+    "brand": "Canvas Creators",
+    "category": "toys",
+    "price_cents": 5400,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "multi"
+    ],
+    "tags": [
+      "art",
+      "craft",
+      "kids"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1507668077129-56e32842fceb?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.5,
+    "num_reviews": 187,
+    "in_stock": true
+  },
+  {
+    "id": "prod_orbit_racetrack",
+    "title": "Orbit Velocity Racetrack",
+    "description": "Modular electric racetrack with dual-speed controllers and LED-lit cars.",
+    "brand": "OrbitPlay",
+    "category": "toys",
+    "price_cents": 7600,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "black",
+      "red"
+    ],
+    "tags": [
+      "racetrack",
+      "electric",
+      "family"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.2,
+    "num_reviews": 142,
+    "in_stock": true
+  },
+  {
+    "id": "prod_storytime_plush",
+    "title": "StoryTime Plush Companion",
+    "description": "Soft plush with recorded bedtime stories and customizable playlist.",
+    "brand": "StoryTime",
+    "category": "toys",
+    "price_cents": 3800,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "tan",
+      "white"
+    ],
+    "tags": [
+      "plush",
+      "bedtime",
+      "interactive"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1549576490-b0b4831ef60a?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.4,
+    "num_reviews": 205,
+    "in_stock": true
+  },
+  {
+    "id": "prod_book_moonlit",
+    "title": "Moonlit Atlas (Hardcover)",
+    "description": "Illustrated travelogue exploring remote destinations under the night sky.",
+    "brand": "Harbor Press",
+    "category": "books",
+    "price_cents": 2800,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "navy"
+    ],
+    "tags": [
+      "travel",
+      "illustrated",
+      "coffee table"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.5,
+    "num_reviews": 97,
+    "in_stock": true
+  },
+  {
+    "id": "prod_book_designsystems",
+    "title": "Design Systems Playbook",
+    "description": "Guide to building scalable design systems with practical case studies.",
+    "brand": "Northwind Books",
+    "category": "books",
+    "price_cents": 3200,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "white"
+    ],
+    "tags": [
+      "design",
+      "systems",
+      "ux"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.6,
+    "num_reviews": 142,
+    "in_stock": true
+  },
+  {
+    "id": "prod_book_wildforage",
+    "title": "Wild Forage Handbook",
+    "description": "Field guide to identifying edible plants with seasonal recipes.",
+    "brand": "Evergreen Press",
+    "category": "books",
+    "price_cents": 2600,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "green"
+    ],
+    "tags": [
+      "nature",
+      "foraging",
+      "recipes"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1457694587812-e8bf29a43845?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.4,
+    "num_reviews": 88,
+    "in_stock": true
+  },
+  {
+    "id": "prod_book_microadventures",
+    "title": "Micro Adventures Field Notes",
+    "description": "Collection of weekend adventure itineraries with packing tips and maps.",
+    "brand": "Summit Reads",
+    "category": "books",
+    "price_cents": 2400,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "brown"
+    ],
+    "tags": [
+      "adventure",
+      "outdoor",
+      "guide"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1473862170183-496f6f36b94c?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.3,
+    "num_reviews": 76,
+    "in_stock": true
+  },
+  {
+    "id": "prod_book_mindfulminutes",
+    "title": "Mindful Minutes Journal",
+    "description": "Daily mindfulness journal with prompts for gratitude and reflection.",
+    "brand": "Kindred Ink",
+    "category": "books",
+    "price_cents": 2200,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "white",
+      "gold"
+    ],
+    "tags": [
+      "journal",
+      "mindfulness",
+      "wellness"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.7,
+    "num_reviews": 211,
+    "in_stock": true
+  },
+  {
+    "id": "prod_meridian_denim",
+    "title": "Meridian Selvage Denim",
+    "description": "Straight-fit selvage denim with mid-rise waist and slight stretch.",
+    "brand": "Meridian",
+    "category": "fashion",
+    "price_cents": 9800,
+    "currency": "USD",
+    "sizes": [
+      "28",
+      "30",
+      "32",
+      "34",
+      "36"
+    ],
+    "colors": [
+      "indigo"
+    ],
+    "tags": [
+      "jeans",
+      "selvage",
+      "denim"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.5,
+    "num_reviews": 168,
+    "in_stock": true
+  },
+  {
+    "id": "prod_cascade_parka",
+    "title": "Cascade Waterproof Parka",
+    "description": "Insulated waterproof parka with removable faux-fur hood trim.",
+    "brand": "Cascade",
+    "category": "fashion",
+    "price_cents": 18900,
+    "currency": "USD",
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "colors": [
+      "navy",
+      "black"
+    ],
+    "tags": [
+      "outerwear",
+      "winter",
+      "waterproof"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1490093158370-1a6be674437b?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.6,
+    "num_reviews": 204,
+    "in_stock": true
+  },
+  {
+    "id": "prod_solace_cashmere",
+    "title": "Solace Cashmere Sweater",
+    "description": "Luxurious cashmere crewneck sweater with ribbed cuffs and hem.",
+    "brand": "Solace",
+    "category": "fashion",
+    "price_cents": 24900,
+    "currency": "USD",
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L"
+    ],
+    "colors": [
+      "camel"
+    ],
+    "tags": [
+      "sweater",
+      "cashmere",
+      "luxury"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.7,
+    "num_reviews": 189,
+    "in_stock": true
+  },
+  {
+    "id": "prod_aurora_wrapdress",
+    "title": "Aurora Wrap Midi Dress",
+    "description": "Soft crepe wrap dress with waist tie and flutter sleeves.",
+    "brand": "Aurora",
+    "category": "fashion",
+    "price_cents": 15800,
+    "currency": "USD",
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "colors": [
+      "rose"
+    ],
+    "tags": [
+      "dress",
+      "wrap",
+      "occasion"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.6,
+    "num_reviews": 153,
+    "in_stock": true
+  },
+  {
+    "id": "prod_pace_athleisure",
+    "title": "Pace Seamless Athleisure Set",
+    "description": "Two-piece seamless set with supportive sports bra and high-rise leggings.",
+    "brand": "Pace",
+    "category": "fashion",
+    "price_cents": 11200,
+    "currency": "USD",
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L"
+    ],
+    "colors": [
+      "sage"
+    ],
+    "tags": [
+      "athleisure",
+      "leggings",
+      "set"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.4,
+    "num_reviews": 132,
+    "in_stock": true
+  },
+  {
+    "id": "prod_quill_mechanicalpen",
+    "title": "QuillCraft Mechanical Pencil",
+    "description": "Aluminum mechanical pencil with knurled grip and 0.7mm HB lead.",
+    "brand": "QuillCraft",
+    "category": "office",
+    "price_cents": 1800,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "silver"
+    ],
+    "tags": [
+      "writing",
+      "pencil",
+      "stationery"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.5,
+    "num_reviews": 84,
+    "in_stock": true
+  },
+  {
+    "id": "prod_slate_deskmat",
+    "title": "SlateDesk Leather Desk Mat",
+    "description": "Full-grain leather desk mat with suede backing and cable pass-through.",
+    "brand": "SlateDesk",
+    "category": "office",
+    "price_cents": 8900,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "brown"
+    ],
+    "tags": [
+      "desk mat",
+      "leather",
+      "workspace"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1487014679447-9f8336841d58?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.6,
+    "num_reviews": 173,
+    "in_stock": true
+  },
+  {
+    "id": "prod_lumen_tasklamp",
+    "title": "LumenArc Adjustable Task Lamp",
+    "description": "LED task lamp with adjustable arm, dimmer touch controls, and USB charging port.",
+    "brand": "LumenArc",
+    "category": "office",
+    "price_cents": 12900,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "black"
+    ],
+    "tags": [
+      "lamp",
+      "led",
+      "desk"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1516387938699-a93567ec168e?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.7,
+    "num_reviews": 214,
+    "in_stock": true
+  },
+  {
+    "id": "prod_modulo_organizer",
+    "title": "Modulo Desk Organizer",
+    "description": "Modular desk organizer with trays, pen cups, and phone stand.",
+    "brand": "Modulo",
+    "category": "office",
+    "price_cents": 5200,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "white",
+      "oak"
+    ],
+    "tags": [
+      "organizer",
+      "desk",
+      "storage"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1527430253228-e93688616381?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.4,
+    "num_reviews": 121,
+    "in_stock": true
+  },
+  {
+    "id": "prod_echo_conference",
+    "title": "EchoWave Conference Speaker",
+    "description": "360\u00b0 conference speakerphone with beamforming microphones and USB-C.",
+    "brand": "EchoWave",
+    "category": "office",
+    "price_cents": 21900,
+    "currency": "USD",
+    "sizes": [],
+    "colors": [
+      "black"
+    ],
+    "tags": [
+      "conference",
+      "speaker",
+      "usb-c"
+    ],
+    "image_urls": [
+      "https://images.unsplash.com/photo-1518449072876-5bcab24f5b31?auto=format&fit=crop&w=800&q=80"
+    ],
+    "rating": 4.5,
+    "num_reviews": 138,
     "in_stock": true
   }
 ]

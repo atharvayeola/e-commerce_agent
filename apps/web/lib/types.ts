@@ -4,6 +4,8 @@ export type ProductCard = {
   image?: string | null;
   price_cents: number;
   currency: string;
+  category?: string | null;
+  description?: string | null;
   badges: string[];
   rationale?: string | null;
   source?: "web" | "catalog" | string;

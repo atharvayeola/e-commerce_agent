@@ -11,18 +11,14 @@ from typing import List, Optional, Set
 from fastapi import APIRouter
 from pydantic import ValidationError
 
+from ..core.dataset import load_catalog
 from ..core.llm_adapter import summarize_text
 from ..core.web_fetch import fetch_and_extract, to_product_card
 from ..core.web_search import search as web_search
 from ..core.browseai_adapter import fetch_from_browseai
 from ..core.image_analysis import analyze_image
 
-from ..schemas import (
-    AgentChatRequest,
-    AgentChatResponse,
-    ProductCard,
-    RecommendRequest,
-)
+from ..schemas import AgentChatRequest, AgentChatResponse, ProductCard, RecommendRequest
 from .recommend import recommend_products
 
 
@@ -54,6 +50,140 @@ _PRODUCT_KEYWORDS = {
     "size",
     "color",
 }
+
+_CATALOG_STOPWORDS = {
+    "find",
+    "show",
+    "me",
+    "for",
+    "a",
+    "an",
+    "the",
+    "please",
+    "need",
+    "looking",
+    "search",
+    "recommend",
+    "recommendation",
+    "want",
+    "would",
+    "like",
+    "buy",
+    "i",
+    "am",
+    "to",
+    "on",
+    "with",
+    "of",
+    "any",
+    "some",
+    "something",
+    "help",
+    "and",
+    "or",
+    "but",
+    "so",
+    "if",
+    "then",
+    "than",
+    "not",
+    "is",
+    "are",
+    "be",
+    "being",
+    "was",
+    "were",
+    "have",
+    "has",
+    "had",
+    "my",
+    "your",
+    "their",
+    "our",
+    "this",
+    "that",
+    "these",
+    "those",
+    "here",
+    "there",
+    "under",
+    "over",
+    "between",
+    "around",
+    "more",
+    "less",
+    "budget",
+}
+
+
+
+def _catalog_query_terms(message: str) -> List[str]:
+    tokens = [term for term in re.split(r"[^a-z0-9]+", message.lower()) if term]
+    return [
+        term
+        for term in tokens
+        if term not in _CATALOG_STOPWORDS
+        and not term.isdigit()
+        and len(term) > 1
+    ]
+
+
+def _catalog_product_cards(message: str, limit: int) -> List[ProductCard]:
+    terms = _catalog_query_terms(message)
+    if not terms:
+        return []
+
+    scored = []
+    lowered_message = message.strip().lower()
+    for product in load_catalog():
+        haystack_parts = filter(
+            None,
+            [
+                product.title,
+                product.brand,
+                product.category,
+                " ".join(product.tags),
+                product.description,
+            ],
+        )
+        haystack = " ".join(haystack_parts).lower()
+        if not haystack:
+            continue
+        haystack_tokens: Set[str] = {
+            token
+            for token in re.split(r"[^a-z0-9]+", haystack)
+            if token
+        }
+        matches = sum(1 for term in terms if term in haystack_tokens)
+        if matches == 0:
+            continue
+        score = matches / len(terms)
+        if lowered_message and lowered_message in product.title.lower():
+            score += 0.75
+        scored.append((score, product))
+
+    scored.sort(key=lambda item: item[0], reverse=True)
+    cards: List[ProductCard] = []
+    for _, product in scored[:limit]:
+        badges: List[str] = []
+        if product.brand:
+            badges.append(product.brand)
+        rationale = product.tags[0] if product.tags else product.description
+        cards.append(
+            ProductCard(
+                id=product.id,
+                title=product.title,
+                image=product.image_urls[0] if product.image_urls else None,
+                price_cents=product.price_cents,
+                currency=product.currency,
+                category=product.category,
+                description=product.description,
+                badges=badges,
+                rationale=rationale,
+                source="catalog",
+            )
+        )
+    return cards
 
 
 def _classify_smalltalk(message: str) -> Optional[str]:
@@ -206,6 +336,19 @@ def chat(request: AgentChatRequest) -> AgentChatResponse:
         return AgentChatResponse(intent=intent, text=text, products=web_cards)
 
     limit = _WEB_SEARCH_LIMIT
+
+    if intent == "text_recommendation":
+        catalog_cards = _catalog_product_cards(request.message, limit)
+        if catalog_cards:
+            explanation = f"I found {len(catalog_cards)} item(s) in our catalog that match your request."
+            follow_up = _follow_up_question(request.message, len(catalog_cards))
+            return AgentChatResponse(
+                intent=intent,
+                text=explanation,
+                products=catalog_cards,
+                follow_up_question=follow_up,
+            )
+        
     web_cards: List[ProductCard] = []
     if getattr(request, "allow_web", False):
         web_cards = _web_product_cards(request.message, limit=limit)
@@ -234,6 +377,8 @@ def chat(request: AgentChatRequest) -> AgentChatResponse:
                         image=(it.get("image_urls") or [None])[0],
                         price_cents=it.get("price_cents") or 0,
                         currency=it.get("currency") or "USD",
+                        category=it.get("category"),
+                        description=it.get("description"),
                         badges=it.get("tags") or [],
                         rationale=it.get("description"),
                         source="browseai",
@@ -299,6 +444,7 @@ def _web_product_cards(message: str, limit: int = _WEB_SEARCH_LIMIT) -> List[Pro
 
         description = product.get("description") or fetched.get("excerpt") or ""
 
+        short_description = description[:280].strip() if description else None
         try:
             card = ProductCard(
                 id=product["id"],
@@ -306,8 +452,10 @@ def _web_product_cards(message: str, limit: int = _WEB_SEARCH_LIMIT) -> List[Pro
                 image=image,
                 price_cents=product.get("price_cents") or 0,
                 currency=product.get("currency") or "USD",
+                category=product.get("category"),
+                description=short_description,
                 badges=badges[:3],
-                rationale=description[:280] if description else None,
+                rationale=short_description,
                 source="web",
                 url=fetched.get("url"),
             )

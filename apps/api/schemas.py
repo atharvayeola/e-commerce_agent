@@ -31,6 +31,8 @@ class ProductCard(BaseModel):
     image: Optional[HttpUrl] = None
     price_cents: int
     currency: str = "USD"
+    category: Optional[str] = None
+    description: Optional[str] = None
     badges: List[str] = Field(default_factory=list)
     rationale: Optional[str] = None
     source: str = "catalog"

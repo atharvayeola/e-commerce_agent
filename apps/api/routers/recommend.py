@@ -167,6 +167,8 @@ def recommend_products(request: RecommendRequest) -> SearchResponse:
             image=item.product.image_urls[0] if item.product.image_urls else None,
             price_cents=item.product.price_cents,
             currency=item.product.currency,
+            category=item.product.category,
+            description=item.product.description,
             badges=[item.product.brand] if item.product.brand else [],
             rationale=item.rationale,
             source="catalog",

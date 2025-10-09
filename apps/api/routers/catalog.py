@@ -34,8 +34,10 @@ def _product_to_card(product) -> ProductCard:
         image=product.image_urls[0] if product.image_urls else None,
         price_cents=product.price_cents,
         currency=product.currency,
+        category=product.category,
+        description=product.description,
         badges=[product.brand] if product.brand else [],
-        rationale=product.description,
+        rationale=(product.tags[0] if product.tags else product.description),
         source="catalog",
     )
 

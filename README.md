@@ -1,6 +1,12 @@
 # CommerceAgent Monorepo
 
-This repository bootstraps a commerce-focused conversational agent spanning FastAPI backend services, a Next.js frontend, offline ingestion scripts, and Docker-based infrastructure. It captures the architecture and implementation roadmap described in the project brief so contributors can expand from a working scaffold.
+This repository implements a commerce-focused conversational agent spanning:
+- FastAPI backend services
+- Next.js frontend chat UI
+- Offline ingestion/evaluation scripts
+- Optional Postgres/pgvector via Docker
+
+It now includes server-side Browse.ai integration, ViT-based image analysis, safer secrets handling, and improved developer ergonomics.
 
 ## Overview
 
@@ -24,14 +30,19 @@ docker-compose.yml   # Local development stack
 
 ## Backend API
 
-The FastAPI service follows the OpenAPI schema defined in the roadmap. Key endpoints:
+Key endpoints (FastAPI):
+- GET `/` (root): landing, links to docs
+- GET `/healthz`: basic healthcheck
+- POST `/recommend`: catalog recommendations with filters
+- POST `/agent/chat`: agentic router that supports smalltalk, text recommendations, image search, and optional web/browse sourcing
 
-
-Run the API locally:
+Run the API locally (quick):
 
 ```bash
+source agent_env/bin/activate  # or create your own venv
 pip install -r apps/api/requirements.txt
-PYTHONPATH=apps uvicorn api.main:app --reload
+export PYTHONPATH=apps
+uvicorn apps.api.main:app --reload
 ```
 # CommerceAgent Monorepo
 
@@ -75,12 +86,13 @@ export PYTHONPATH=apps
 uvicorn api.main:app --reload
 ```
 
-Frontend (Next):
+Frontend (Next.js):
 
 ```bash
 cd apps/web
 npm install
-NEXT_PUBLIC_API_BASE="http://localhost:8000" npm run dev
+export NEXT_PUBLIC_API_BASE="http://localhost:8000"
+npm run dev
 ```
 
 Notes:
@@ -91,22 +103,30 @@ Notes:
 
 ## Important environment variables (dev/ops)
 
-- WEB_FETCH_ALLOWLIST (optional): comma-separated domains allowed for web fetching, e.g. `amazon.com,walmart.com`
-- WEB_FETCH_ALLOW_ALL (dev override): set to `1` to allow fetching from all domains (use only in dev!)
-- HF_TOKEN (optional): Hugging Face token if you want `llm_adapter` to call a real HF model for page summarization; otherwise a deterministic mock summary is used.
-- NEXT_PUBLIC_API_BASE: frontend env var to point the Next client at the API server.
-- BROWSEAI_API_KEY: backend-only secret for Browse.ai extractor runs (DO NOT expose to frontend).
-- NEXT_PUBLIC_BROWSE_AI_EXTRACTOR_ID: optional extractor id exposed to the frontend to enable Browse.ai integration (leave blank to disable). The frontend never sends the API key now; the backend reads `BROWSEAI_API_KEY` directly.
+- `WEB_FETCH_ALLOWLIST` (optional): comma-separated domains allowed for web fetching, e.g. `amazon.com,walmart.com`
+- `WEB_FETCH_ALLOW_ALL` (dev override): set to `1` to allow fetching from ALL domains (use only in dev)
+- `HF_TOKEN` (optional): token to let `llm_adapter` call a real HF model; otherwise a deterministic mock is used
+- `NEXT_PUBLIC_API_BASE` (frontend): base URL of the API, default `http://localhost:8000`
+- `BROWSEAI_API_KEY` (backend only): secret for Browse.ai extractor runs; DO NOT expose to frontend
+- `NEXT_PUBLIC_BROWSE_AI_EXTRACTOR_ID` (frontend): default extractor id to use (optional)
+- `BROWSEAI_DEBUG` (backend, optional): set `1` for verbose adapter logs (requests, polling, cache)
 
 ---
 
-## How the agent uses web content
+## How the agent uses web + browse content
 
 1. When the client sets `allow_web=true` (and optionally provides a `web_url`), the backend will try to fetch and extract page text via `fetch_and_extract()`.
 2. The extracted text may be summarized via `llm_adapter.summarize_text()` to keep prompts compact.
 3. If the local catalog recommendation returns no results and `allow_web=true`, the agent will run a DuckDuckGo fallback search for candidate pages, fetch them, extract metadata (OG/JSON-LD), convert to product-like cards, and return these to the client.
 
-Returned web-sourced cards include fields: `id`, `title`, `image_urls`, `price_cents`, `currency`, `badges`, `description`/`rationale`, `source`, and `url` to help the frontend present them and attribute origin.
+Returned web-sourced cards include fields: `id`, `title`, `image_urls`, `price_cents`, `currency`, `badges`, `description`/`rationale`, `source`, and `url` to help the frontend present them and attribute origin. Browse.ai-sourced cards are normalized to the same shape with `source: "browseai"`.
+
+What’s new (Oct 2025):
+- Server-only Browse.ai integration. The frontend no longer sends or stores API keys. Set `BROWSEAI_API_KEY` on the backend; optionally set `NEXT_PUBLIC_BROWSE_AI_EXTRACTOR_ID` on the frontend.
+- Added `browse_force` flag to `/agent/chat` to bypass cache and force a fresh Browse.ai run.
+- Added `BROWSEAI_DEBUG=1` to surface detailed adapter logs.
+- ViT-based image analysis for visual search with `transformers` + `Pillow`.
+- Allow-all web fetch for quick prototyping: `WEB_FETCH_ALLOW_ALL=1`.
 
 ---
 
@@ -134,7 +154,25 @@ curl -X POST http://127.0.0.1:8000/agent/chat \
   -d '{"message":"does this fit my needs","web_url":"https://www.example.com/product/123","allow_web":true}'
 ```
 
-If web-derived products are found, the JSON response will include products with `source: "web"` and a `url` field. The Next frontend displays a small badge with the source and links the title to the original page.
+If web-derived products are found, the JSON includes products with `source: "web"` and a `url`. If Browse.ai results are found, they include `source: "browseai"`. The frontend displays a small source badge and links titles to the original page.
+
+Browse.ai (server-side) example:
+
+```bash
+curl -X POST http://127.0.0.1:8000/agent/chat \
+  -H 'Content-Type: application/json' \
+  -d '{
+        "message":"wireless earbuds under 100",
+        "allow_web": true,
+        "browse_extractor": "<YOUR_EXTRACTOR_ID>",
+        "browse_force": true
+      }'
+```
+
+Notes:
+- Set `BROWSEAI_API_KEY` in the server environment. The frontend never sends the key.
+- A 403 from Browse.ai usually means invalid extractor id, insufficient permissions, or plan limitations.
+- With `BROWSEAI_DEBUG=1`, logs include top-level response keys and polling progress.
 
 ---
 
@@ -155,10 +193,20 @@ Current test status (dev machine): 8 passed, 1 warning.
 ## Safety & production notes
 
 - The DuckDuckGo HTML scraping fallback is brittle and intended for prototyping. For production, use a SERP provider (SerpAPI, Bing) with proper API keys and rate-limiting.
-- Be careful with `WEB_FETCH_ALLOW_ALL=1` — enabling it in production could expose your service to scraping arbitrary websites. Use `WEB_FETCH_ALLOWLIST` or admin controls for safety.
+- Be careful with `WEB_FETCH_ALLOW_ALL=1` — in production, use `WEB_FETCH_ALLOWLIST` and respect robots.txt. Add rate-limiting and per-domain throttling.
+- Never expose `BROWSEAI_API_KEY` to the frontend. Keep secrets in server env or a secret manager. Rotate keys if they were exposed.
 - Consider robots.txt checks, rate limits, and per-domain throttling before enabling broad web discovery.
 
 ---
+
+## Image search: ViT-based analysis
+
+The image-based search pipeline extracts visual features using a lightweight Vision Transformer and matches against catalog entries.
+
+- Code: `apps/api/core/image_analysis.py`
+- Deps: `transformers`, `Pillow` (see `apps/api/requirements.txt`)
+- Endpoint: `/agent/chat` with `image_b64` triggers image search
+- Behavior: Dominant colors + visual embeddings guide similarity; results include catalog `ProductCard`s with a visual rationale.
 
 ## Future improvements (shortlist)
 
