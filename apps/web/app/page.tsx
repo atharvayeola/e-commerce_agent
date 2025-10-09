@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Chat from "../components/Chat";
+import Chat, { ExternalMessage } from "../components/Chat";
 import Filters from "../components/Filters";
 import ImageDropzone from "../components/ImageDropzone";
 import ProductGrid from "../components/ProductGrid";
@@ -17,8 +17,10 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false);
   const [priceRange, setPriceRange] = useState<{ min: number; max: number }>({ min: 0, max: 2000 });
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [chatExternalMessages, setChatExternalMessages] = useState<ExternalMessage[]>([]);
+  const [chatExternalLoading, setChatExternalLoading] = useState(false);
 
-  function handleResponse(response: AgentResponse) {
+  function handleResponse(response: AgentResponse, source: "text" | "image" = "text") {
     setProducts(response.products);
     const filtered = response.products.filter(product => {
       const priceInDollars = product.price_cents / 100;
@@ -26,6 +28,9 @@ export default function HomePage() {
     });
     setFilteredProducts(filtered);
     setFollowUp(response.follow_up_question ?? null);
+    if (source === "image") {
+      setChatExternalMessages(prev => [...prev, { role: "assistant", content: response.text }]);
+    }
   }
 
   async function handleImageUpload(file: File) {
@@ -33,11 +38,14 @@ export default function HomePage() {
     reader.onload = async () => {
       const base64 = (reader.result as string).split(",")[1] ?? "";
       setLoading(true);
+      setChatExternalMessages([{ role: "user", content: "Uploaded an image for visual search." }]);
+      setChatExternalLoading(true);
       try {
         const response = await sendAgentMessage("", { image_b64: base64 });
-        handleResponse(response);
+        handleResponse(response, "image");
       } finally {
         setLoading(false);
+        setChatExternalLoading(false);
       }
     };
     reader.readAsDataURL(file);
@@ -77,7 +85,12 @@ export default function HomePage() {
               });
               setFilteredProducts(filtered);
             }} />
-            <Chat onResponse={handleResponse} />
+            <Chat
+              onResponse={handleResponse}
+              externalMessages={chatExternalMessages}
+              onExternalMessagesConsumed={() => setChatExternalMessages([])}
+              externalLoading={chatExternalLoading}
+            />
           </section>
           <section className="space-y-4 lg:w-2/3">
             {loading && <p className="text-xs text-slate-500">Fetching results…</p>}

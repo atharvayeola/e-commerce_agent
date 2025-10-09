@@ -1,17 +1,17 @@
 
 "use client";
 
-import { FormEvent, useState } from "react";
-import { AgentResponse, ProductCard } from "../lib/types";
+import { FormEvent, useEffect, useState } from "react";
+import { AgentResponse } from "../lib/types";
 import { sendAgentMessage } from "../lib/agentClient";
 import { DEFAULT_BROWSE_AI_EXTRACTOR } from "/Users/ayeola/Downloads/test_agent/apps/web/lib/config";
-import { PriceRange } from "./Filters";
 
 export type ChatMessage = {
   id: string;
   role: "user" | "assistant";
   content: string;
 };
+export type ExternalMessage = Omit<ChatMessage, "id">;
 
 function createId() {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
@@ -20,12 +20,39 @@ function createId() {
   return Math.random().toString(36).slice(2);
 }
 
-export default function Chat({ onResponse }: { onResponse: (response: AgentResponse) => void }) {
+type ChatProps = {
+  onResponse: (response: AgentResponse, source?: "text" | "image") => void;
+  externalMessages?: ExternalMessage[];
+  externalLoading?: boolean;
+  onExternalMessagesConsumed?: () => void;
+};
+
+export default function Chat({
+  onResponse,
+  externalMessages,
+  externalLoading = false,
+  onExternalMessagesConsumed,
+}: ChatProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [webUrl, setWebUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const browseConfigured = Boolean(DEFAULT_BROWSE_AI_EXTRACTOR);
+    const combinedLoading = loading || externalLoading;
+
+  useEffect(() => {
+    if (externalMessages && externalMessages.length > 0) {
+      setMessages(prev => [
+        ...prev,
+        ...externalMessages.map(message => ({
+          id: createId(),
+          role: message.role,
+          content: message.content,
+        })),
+      ]);
+      onExternalMessagesConsumed?.();
+    }
+  }, [externalMessages, onExternalMessagesConsumed]);
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const trimmedMessage = input.trim();
@@ -37,7 +64,7 @@ export default function Chat({ onResponse }: { onResponse: (response: AgentRespo
     setLoading(true);
     try {
       const response = await sendAgentMessage(userMessage.content, { web_url: trimmedUrl || undefined });
-      onResponse(response);
+      onResponse(response, "text");
       const assistantMessage: ChatMessage = {
         id: createId(),
         role: "assistant",
@@ -79,7 +106,7 @@ export default function Chat({ onResponse }: { onResponse: (response: AgentRespo
             );
           })
         )}
-        {loading && <p className="text-xs text-slate-400">Thinking…</p>}
+        {combinedLoading && <p className="text-xs text-slate-400">Thinking…</p>}
       </div>
       <form onSubmit={handleSubmit} className="space-y-3 border-t border-slate-200 p-4">
         <div className="flex flex-col gap-2 sm:flex-row">
@@ -97,7 +124,7 @@ export default function Chat({ onResponse }: { onResponse: (response: AgentRespo
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={combinedLoading}
             className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
           >
             Send
