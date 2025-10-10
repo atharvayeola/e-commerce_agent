@@ -218,10 +218,6 @@ The image-based search pipeline extracts visual features using a lightweight Vis
 
 ---
 
-If you'd like, I can open a PR description summarizing these changes for reviewers, or add a short CHANGELOG.md capturing the per-commit summary.
-
----
-
 ## Local pgvector for development
 
 The repo includes a lightweight docker-compose file to run Postgres with the pgvector extension for local testing.
