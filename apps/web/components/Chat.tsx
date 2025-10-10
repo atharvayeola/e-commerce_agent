@@ -37,6 +37,7 @@ export default function Chat({
   const [input, setInput] = useState("");
   const [webUrl, setWebUrl] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const browseConfigured = Boolean(DEFAULT_BROWSE_AI_EXTRACTOR);
     const combinedLoading = loading || externalLoading;
 
@@ -58,6 +59,7 @@ export default function Chat({
     const trimmedMessage = input.trim();
     const trimmedUrl = webUrl.trim();
     if (!trimmedMessage) return;
+    setError(null);
     const userMessage: ChatMessage = { id: createId(), role: "user", content: trimmedMessage };
     setMessages(prev => [...prev, userMessage]);
     setInput("");
@@ -73,6 +75,16 @@ export default function Chat({
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
       console.error(error);
+      const msg = error instanceof Error ? error.message : "Request failed";
+      setError(msg);
+      setMessages(prev => [
+        ...prev,
+        {
+          id: createId(),
+          role: "assistant",
+          content: `Sorry, I couldn't process that request. ${msg}`,
+        },
+      ]);
     } finally {
       setLoading(false);
     }
@@ -109,6 +121,11 @@ export default function Chat({
         {combinedLoading && <p className="text-xs text-slate-400">Thinking…</p>}
       </div>
       <form onSubmit={handleSubmit} className="space-y-3 border-t border-slate-200 p-4">
+        {error && (
+          <div className="rounded-md border border-red-200 bg-red-50 p-2 text-xs text-red-700">
+            {error}
+          </div>
+        )}
         <div className="flex flex-col gap-2 sm:flex-row">
           <label className="sr-only" htmlFor="agent-message">
             Ask CommerceAgent for a product
