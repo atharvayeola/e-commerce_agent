@@ -1,14 +1,11 @@
 services:
   - type: web
     name: commerce-agent-api
-    env: python
+    env: docker
     plan: free
     rootDir: .
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "uvicorn apps.api.main:app --host 0.0.0.0 --port $PORT"
+    dockerfilePath: docker/Dockerfile.api
     envVars:
-      - key: PYTHON_VERSION
-        value: 3.11.10
       - key: PYTHONPATH
         value: apps
       - key: CORS_ALLOW_ORIGINS
