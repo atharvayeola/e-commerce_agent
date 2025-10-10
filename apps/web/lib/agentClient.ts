@@ -21,7 +21,8 @@ export async function sendAgentMessage(
   message: string,
   options: AgentMessageOptions = {}
 ): Promise<AgentResponse> {
-  const body: any = { message, allow_web: options.allow_web ?? true };
+  const inferredAllowWeb = options.allow_web ?? (Boolean(options.web_url) || Boolean(options.image_b64));
+  const body: any = { message, allow_web: inferredAllowWeb };
   if (options.image_b64) body.image_b64 = options.image_b64;
   if (options.web_url) body.web_url = options.web_url;
 
