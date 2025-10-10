@@ -36,9 +36,6 @@ export default function ProductGrid({ products }: { products: ProductCard[] }) {
         const categoryLabel = formatCategoryLabel(product.category);
         return (
           <article key={product.id} className="flex flex-col rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-            {product.image && (
-              <img src={product.image} alt={product.title} className="h-40 w-full rounded-md object-cover" />
-            )}
             <div className="flex items-center justify-between">
               {product.url ? (
                 <a href={product.url} target="_blank" rel="noreferrer" className="mt-3 text-base font-semibold text-slate-900 hover:underline">
