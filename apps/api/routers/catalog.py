@@ -86,6 +86,8 @@ def image_search(request: ImageSearchRequest) -> SearchResponse:
     label_keywords = label_hints.keywords
     label_categories = label_hints.categories
     query_text = request.query or ""
+    if analysis and analysis.caption:
+        query_text = (query_text + " " + analysis.caption).strip()
 
     scored = []
     for product in products:
@@ -149,6 +151,8 @@ def image_search(request: ImageSearchRequest) -> SearchResponse:
             rationale_parts.append(f"looks like {keyword_matches[0]}")
         elif category_score > 0 and label_categories:
             rationale_parts.append(f"similar {label_categories[0]} item")
+        if analysis and analysis.caption and analysis.caption.lower() in haystack_lower:
+            rationale_parts.append("matches the scene described in your image")
         if not rationale_parts and product.tags:
             rationale_parts.append(product.tags[0])
 

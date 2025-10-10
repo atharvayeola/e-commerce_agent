@@ -302,6 +302,8 @@ def chat(request: AgentChatRequest) -> AgentChatResponse:
         query_parts: List[str] = []
         if request.message and request.message.strip():
             query_parts.append(request.message.strip())
+        if analysis and analysis.caption:
+            query_parts.append(analysis.caption)
         if object_terms:
             natural = [term.replace("_", " ") for term in object_terms[:2]]
             query_parts.append(" ".join(natural))
@@ -313,6 +315,8 @@ def chat(request: AgentChatRequest) -> AgentChatResponse:
         web_cards = _web_product_cards(" ".join(query_parts), limit=_WEB_SEARCH_LIMIT)
 
         descriptors: List[str] = []
+        if analysis and analysis.caption:
+            descriptors.append(f"details like '{analysis.caption}'")
         if color_terms:
             descriptors.append(f"the {', '.join(color_terms[:2])} palette")
         if object_terms:

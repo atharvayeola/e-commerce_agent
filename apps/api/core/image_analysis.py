@@ -6,6 +6,7 @@ import base64
 import io
 import math
 import os
+import re
 from dataclasses import dataclass, asdict
 from typing import Any, Dict, List, Optional, Set, Tuple
 
@@ -30,6 +31,7 @@ class ImageAnalysis:
     aspect_ratio: float
     notes: List[str]
     detected_objects: List[str]
+    caption: Optional[str] = None
 
     def to_dict(self) -> Dict:
         data = asdict(self)
@@ -144,6 +146,8 @@ def _nearest_color(rgb: Tuple[int, int, int]) -> str:
 
 _CLASSIFIER: Optional[Any] = None
 _CLASSIFIER_DISABLED = object()
+_CAPTIONER: Optional[Any] = None
+_CAPTIONER_DISABLED = object()
 
 
 def _object_labels(image: "Image.Image") -> List[str]:  # type: ignore[name-defined]
@@ -199,6 +203,58 @@ def _object_labels(image: "Image.Image") -> List[str]:  # type: ignore[name-defi
         labels.append(str(label))
     return labels
 
+def _describe_image(image: "Image.Image") -> Optional[str]:  # type: ignore[name-defined]
+    """Generate a descriptive caption for the image when possible."""
+
+    global _CAPTIONER
+
+    allow_captioner = os.environ.get("ENABLE_IMAGE_CAPTIONING", "1").lower() in {
+        "1",
+        "true",
+        "yes",
+    }
+
+    if pipeline is None or not allow_captioner:
+        if not allow_captioner:
+            _CAPTIONER = _CAPTIONER_DISABLED
+        return None
+
+    if _CAPTIONER is _CAPTIONER_DISABLED:
+        return None
+
+    if _CAPTIONER is None:
+        try:
+            _CAPTIONER = pipeline(
+                "image-to-text",
+                model="Salesforce/blip-image-captioning-base",
+            )
+        except Exception:
+            _CAPTIONER = _CAPTIONER_DISABLED
+            return None
+
+    if _CAPTIONER is _CAPTIONER_DISABLED or _CAPTIONER is None:
+        return None
+
+    try:
+        result = _CAPTIONER(image)  # type: ignore[misc]
+    except Exception:
+        return None
+
+    caption: Optional[str] = None
+    if isinstance(result, list) and result:
+        first = result[0]
+        if isinstance(first, dict):
+            caption = first.get("generated_text") or first.get("caption")
+        elif isinstance(first, str):
+            caption = first
+    elif isinstance(result, dict):
+        caption = result.get("generated_text") or result.get("caption")
+
+    if caption:
+        cleaned = caption.strip()
+        return cleaned or None
+    return None
+
 def _normalize_label(label: str) -> str:
     return label.lower().replace("_", " ").replace("-", " ").strip()
 
@@ -214,7 +270,19 @@ def labels_to_hints(analysis: Optional[ImageAnalysis]) -> LabelHints:
     seen_keywords: Set[str] = set()
     seen_categories: Set[str] = set()
 
-    for raw_label in analysis.detected_objects:
+    caption_tokens: List[str] = []
+    caption = analysis.caption or ""
+    if caption:
+        for token in re.split(r"[^a-z0-9]+", caption.lower()):
+            if not token:
+                continue
+            if len(token) <= 3:
+                continue
+            if token in {"with", "from", "that", "this", "there", "into", "over", "under", "their", "your", "have"}:
+                continue
+            caption_tokens.append(token)
+
+    for raw_label in analysis.detected_objects + caption_tokens:
         normalized = _normalize_label(raw_label)
         matched = False
         for key, spec in _LABEL_HINTS.items():
@@ -300,6 +368,8 @@ def analyze_image(image_b64: str) -> Optional[ImageAnalysis]:
     if detected_objects:
         notes.append(f"maybe_{detected_objects[0]}")
 
+    caption = _describe_image(img)
+
     return ImageAnalysis(
         dominant_colors=top_colors,
         average_color=avg,
@@ -307,6 +377,7 @@ def analyze_image(image_b64: str) -> Optional[ImageAnalysis]:
         aspect_ratio=aspect_ratio,
         notes=notes,
         detected_objects=detected_objects,
+        caption=caption,
     )
 
 
