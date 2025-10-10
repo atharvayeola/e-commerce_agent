@@ -121,7 +121,7 @@ Notes:
 
 Returned web-sourced cards include fields: `id`, `title`, `image_urls`, `price_cents`, `currency`, `badges`, `description`/`rationale`, `source`, and `url` to help the frontend present them and attribute origin. Browse.ai-sourced cards are normalized to the same shape with `source: "browseai"`.
 
-What’s new (Oct 2025):
+What’s new:
 - Server-only Browse.ai integration. The frontend no longer sends or stores API keys. Set `BROWSEAI_API_KEY` on the backend; optionally set `NEXT_PUBLIC_BROWSE_AI_EXTRACTOR_ID` on the frontend.
 - Added `browse_force` flag to `/agent/chat` to bypass cache and force a fresh Browse.ai run.
 - Added `BROWSEAI_DEBUG=1` to surface detailed adapter logs.
