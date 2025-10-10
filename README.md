@@ -1,12 +1,11 @@
 # CommerceAgent Monorepo
 
-An end-to-end, demo-friendly commerce agent:
+An end-to-end e-commerce agent:
 - FastAPI backend (catalog search, image search, agent router)
 - Next.js frontend (chat UI, filters, product grid)
 - Lightweight scripts for ingestion/eval
 - Containerized deploys (Render + Vercel ready)
 
-This README is written for first-time readers. It explains what’s here, how it works, how to run it, the design choices we made, and what’s pending or intentionally out-of-scope (for now).
 
 ## TL;DR
 
@@ -35,7 +34,7 @@ docker-compose.yml   # Optional local stack
 3b) Image flow → analyzes the image (colors, brightness, aspect, optional object labels + caption) and converts to label/category “hints”; these contribute to scoring against the same catalog.
 4) Optional web enrichment → if allowed, fetches a page or falls back to a search, extracts OG/JSON-LD into product-like cards. These appear with source badges.
 
-Everything is intentionally simple and deterministic so the demo runs reliably without external services. Each stub can be swapped out later (vector DB, re-ranker, proper SERP/API, etc.).
+Everything is intentionally simple and deterministic so it runs reliably without external services. Each stub can be swapped out later (vector DB, re-ranker, proper SERP/API, etc.).
 
 ## Key components
 
@@ -90,7 +89,7 @@ Frontend env vars:
 
 ## Product card contract
 
-We return a compact shape the frontend can render consistently:
+It returns a compact shape the frontend can render consistently:
 - id, title, image (optional), price_cents, currency, category
 - description (short), badges (e.g., brand), rationale (why it matched)
 - source (catalog/web/browseai), url (when web-sourced)
@@ -152,9 +151,4 @@ curl -X POST http://127.0.0.1:8000/agent/chat \
   -d '{"message":"espresso grinder under 200","allow_web":true}'
 ```
 
-## Contributing / next steps
 
-- Optional: add `.gitignore` rules for local CSV/metadata dumps you don’t want committed.
-- Add a config flag to toggle image rendering in the grid without code changes.
-- Introduce a simple `text_to_hints()` helper (mirrors image labels → hints) to align text and image relevance signals.
-- Add a tiny smoke test for `/agent/chat` covering the three intents.
