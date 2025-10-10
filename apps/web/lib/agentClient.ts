@@ -9,6 +9,12 @@ const API_BASE = _envApiBase && _envApiBase.trim()
   ? _envApiBase.trim().replace(/\/+$/, "")
   : "http://localhost:8000";
 
+  const _envAllowWebDefault = process.env.NEXT_PUBLIC_AGENT_ALLOW_WEB_DEFAULT;
+const ENV_ALLOW_WEB_DEFAULT =
+  _envAllowWebDefault !== undefined
+    ? !/^false$/i.test(_envAllowWebDefault.trim())
+    : true;
+    
 export type AgentMessageOptions = {
   image_b64?: string;
   web_url?: string;
@@ -21,7 +27,9 @@ export async function sendAgentMessage(
   message: string,
   options: AgentMessageOptions = {}
 ): Promise<AgentResponse> {
-  const inferredAllowWeb = options.allow_web ?? (Boolean(options.web_url) || Boolean(options.image_b64));
+  const inferredAllowWeb =
+    options.allow_web ??
+    (Boolean(options.web_url) || Boolean(options.image_b64) || ENV_ALLOW_WEB_DEFAULT);
   const body: any = { message, allow_web: inferredAllowWeb };
   if (options.image_b64) body.image_b64 = options.image_b64;
   if (options.web_url) body.web_url = options.web_url;
