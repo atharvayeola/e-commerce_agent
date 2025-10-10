@@ -5,8 +5,9 @@ from __future__ import annotations
 import base64
 import io
 import math
+import os
 from dataclasses import dataclass, asdict
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 try:  # Pillow is an optional dependency for richer image search
     from PIL import Image
@@ -36,7 +37,16 @@ class ImageAnalysis:
         data["brightness"] = round(self.brightness, 3)
         return data
 
+@dataclass
+class LabelHints:
+    """Lightweight representation of object labels useful for ranking."""
 
+    keywords: List[str]
+    categories: List[str]
+
+    def to_dict(self) -> Dict[str, List[str]]:
+        return {"keywords": self.keywords, "categories": self.categories}
+    
 _BASIC_COLORS: Dict[str, Tuple[int, int, int]] = {
     "black": (0, 0, 0),
     "gray": (127, 127, 127),
@@ -52,6 +62,70 @@ _BASIC_COLORS: Dict[str, Tuple[int, int, int]] = {
     "pink": (255, 105, 180),
     "brown": (139, 69, 19),
 }
+
+_LABEL_HINTS: Dict[str, Dict[str, List[str]]] = {
+    "shoe": {"keywords": ["shoe", "sneaker", "running"], "categories": ["fashion", "fitness"]},
+    "sandal": {"keywords": ["sandal", "shoe"], "categories": ["fashion"]},
+    "boot": {"keywords": ["boot", "shoe"], "categories": ["fashion", "outdoor"]},
+    "backpack": {"keywords": ["backpack", "bag"], "categories": ["outdoor", "fashion"]},
+    "handbag": {"keywords": ["bag", "handbag"], "categories": ["fashion"]},
+    "laptop": {"keywords": ["laptop", "computer"], "categories": ["electronics"]},
+    "notebook computer": {"keywords": ["laptop", "computer"], "categories": ["electronics"]},
+    "keyboard": {"keywords": ["keyboard"], "categories": ["electronics", "office"]},
+    "monitor": {"keywords": ["monitor", "display"], "categories": ["electronics", "office"]},
+    "screen": {"keywords": ["monitor", "display"], "categories": ["electronics"]},
+    "tablet": {"keywords": ["tablet"], "categories": ["electronics"]},
+    "phone": {"keywords": ["phone", "smartphone"], "categories": ["electronics"]},
+    "camera": {"keywords": ["camera"], "categories": ["electronics"]},
+    "headphone": {"keywords": ["headphone", "audio"], "categories": ["electronics"]},
+    "earphone": {"keywords": ["earbud", "audio"], "categories": ["electronics"]},
+    "speaker": {"keywords": ["speaker", "audio"], "categories": ["electronics", "office"]},
+    "microphone": {"keywords": ["microphone", "audio"], "categories": ["electronics", "office"]},
+    "watch": {"keywords": ["watch"], "categories": ["electronics", "fitness"]},
+    "smartwatch": {"keywords": ["smartwatch", "watch"], "categories": ["electronics", "fitness"]},
+    "vacuum": {"keywords": ["vacuum"], "categories": ["home-appliance"]},
+    "iron": {"keywords": ["iron"], "categories": ["home-appliance"]},
+    "humidifier": {"keywords": ["humidifier"], "categories": ["home-appliance", "beauty"]},
+    "purifier": {"keywords": ["purifier", "filter"], "categories": ["home-appliance"]},
+    "heater": {"keywords": ["heater"], "categories": ["home-appliance"]},
+    "stove": {"keywords": ["stove", "burner"], "categories": ["kitchenware", "outdoor"]},
+    "grill": {"keywords": ["grill"], "categories": ["outdoor", "kitchenware"]},
+    "knife": {"keywords": ["knife"], "categories": ["kitchenware"]},
+    "skillet": {"keywords": ["skillet", "pan"], "categories": ["kitchenware"]},
+    "pot": {"keywords": ["pot", "cookware"], "categories": ["kitchenware"]},
+    "coffee": {"keywords": ["coffee"], "categories": ["kitchenware"]},
+    "grinder": {"keywords": ["grinder"], "categories": ["kitchenware"]},
+    "bottle": {"keywords": ["bottle", "insulated"], "categories": ["outdoor", "fitness"]},
+    "lantern": {"keywords": ["lantern", "light"], "categories": ["outdoor"]},
+    "tent": {"keywords": ["tent"], "categories": ["outdoor"]},
+    "backcountry": {"keywords": ["outdoor"], "categories": ["outdoor"]},
+    "mat": {"keywords": ["mat"], "categories": ["fitness", "home-appliance"]},
+    "yoga": {"keywords": ["yoga"], "categories": ["fitness"]},
+    "dumbbell": {"keywords": ["dumbbell", "weights"], "categories": ["fitness"]},
+    "band": {"keywords": ["band", "resistance"], "categories": ["fitness"]},
+    "book": {"keywords": ["book"], "categories": ["books"]},
+    "journal": {"keywords": ["journal", "notebook"], "categories": ["books", "office"]},
+    "pencil": {"keywords": ["pencil"], "categories": ["office"]},
+    "pen": {"keywords": ["pen"], "categories": ["office"]},
+    "lamp": {"keywords": ["lamp", "light"], "categories": ["office", "home-appliance"]},
+    "organizer": {"keywords": ["organizer", "desk"], "categories": ["office"]},
+    "desk": {"keywords": ["desk"], "categories": ["office"]},
+    "robot": {"keywords": ["robot", "toy"], "categories": ["toys"]},
+    "block": {"keywords": ["blocks", "toy"], "categories": ["toys"]},
+    "kit": {"keywords": ["kit", "toy"], "categories": ["toys", "office"]},
+    "dress": {"keywords": ["dress"], "categories": ["fashion"]},
+    "jacket": {"keywords": ["jacket", "coat"], "categories": ["fashion", "outdoor"]},
+    "sweater": {"keywords": ["sweater", "knit"], "categories": ["fashion"]},
+    "parka": {"keywords": ["parka", "coat"], "categories": ["fashion", "outdoor"]},
+    "jean": {"keywords": ["denim", "jeans"], "categories": ["fashion"]},
+    "serum": {"keywords": ["serum", "skincare"], "categories": ["beauty"]},
+    "cream": {"keywords": ["cream", "skincare"], "categories": ["beauty"]},
+    "moisturizer": {"keywords": ["moisturizer", "skincare"], "categories": ["beauty"]},
+    "palette": {"keywords": ["makeup", "palette"], "categories": ["beauty"]},
+    "cleanser": {"keywords": ["cleanser", "skincare"], "categories": ["beauty"]},
+    "diffuser": {"keywords": ["diffuser", "aroma"], "categories": ["beauty", "home-appliance"]},
+}
+
 
 
 def _euclidean(a: Tuple[int, int, int], b: Tuple[int, int, int]) -> float:
@@ -76,9 +150,20 @@ def _object_labels(image: "Image.Image") -> List[str]:  # type: ignore[name-defi
     """Return high-confidence labels detected by a ViT classifier."""
 
     global _CLASSIFIER
+
+    allow_classifier = os.environ.get("ENABLE_IMAGE_CLASSIFIER", "").lower() in {
+        "1",
+        "true",
+        "yes",
+    }
+
     if pipeline is None:
         return []
 
+    if not allow_classifier:
+        _CLASSIFIER = _CLASSIFIER_DISABLED
+        return []
+    
     if _CLASSIFIER is _CLASSIFIER_DISABLED:
         return []
 
@@ -114,6 +199,57 @@ def _object_labels(image: "Image.Image") -> List[str]:  # type: ignore[name-defi
         labels.append(str(label))
     return labels
 
+def _normalize_label(label: str) -> str:
+    return label.lower().replace("_", " ").replace("-", " ").strip()
+
+
+def labels_to_hints(analysis: Optional[ImageAnalysis]) -> LabelHints:
+    """Translate detected objects into catalog-friendly keywords and categories."""
+
+    if not analysis or not analysis.detected_objects:
+        return LabelHints(keywords=[], categories=[])
+
+    keywords: List[str] = []
+    categories: List[str] = []
+    seen_keywords: Set[str] = set()
+    seen_categories: Set[str] = set()
+
+    for raw_label in analysis.detected_objects:
+        normalized = _normalize_label(raw_label)
+        matched = False
+        for key, spec in _LABEL_HINTS.items():
+            if key in normalized:
+                matched = True
+                for kw in spec.get("keywords", []):
+                    if kw not in seen_keywords:
+                        keywords.append(kw)
+                        seen_keywords.add(kw)
+                for category in spec.get("categories", []):
+                    if category not in seen_categories:
+                        categories.append(category)
+                        seen_categories.add(category)
+        if not matched:
+            for token in normalized.split():
+                spec = _LABEL_HINTS.get(token)
+                if not spec:
+                    continue
+                matched = True
+                for kw in spec.get("keywords", []):
+                    if kw not in seen_keywords:
+                        keywords.append(kw)
+                        seen_keywords.add(kw)
+                for category in spec.get("categories", []):
+                    if category not in seen_categories:
+                        categories.append(category)
+                        seen_categories.add(category)
+
+        if not matched:
+            for token in normalized.split():
+                if token.isalpha() and len(token) > 4 and token not in seen_keywords:
+                    keywords.append(token)
+                    seen_keywords.add(token)
+
+    return LabelHints(keywords=keywords, categories=categories)
 
 def _decode_image(image_b64: str) -> Optional[Image.Image]:  # type: ignore[name-defined]
     if not Image:
@@ -181,7 +317,21 @@ def colors_to_filters(analysis: Optional[ImageAnalysis]) -> List[str]:
         return []
     primary = []
     for color in analysis.dominant_colors:
-        if color in {"black", "gray", "white", "blue", "navy", "green", "red", "yellow", "orange", "purple", "pink", "brown", "teal"}:
+        if color in {
+            "black",
+            "gray",
+            "white",
+            "blue",
+            "navy",
+            "green",
+            "red",
+            "yellow",
+            "orange",
+            "purple",
+            "pink",
+            "brown",
+            "teal",
+        }:
             primary.append(color)
     # Deduplicate while preserving order
     seen = set()

@@ -11,7 +11,7 @@ from __future__ import annotations
 from fastapi import APIRouter
 
 from ..core.dataset import filter_products, load_catalog
-from ..core.image_analysis import analyze_image, colors_to_filters
+from ..core.image_analysis import analyze_image, colors_to_filters, labels_to_hints
 from ..schemas import ImageSearchRequest, ProductCard, SearchRequest, SearchResponse
 
 router = APIRouter()
@@ -82,6 +82,9 @@ def image_search(request: ImageSearchRequest) -> SearchResponse:
 
     analysis = analyze_image(request.image_b64) if request.image_b64 else None
     color_hints = colors_to_filters(analysis)
+    label_hints = labels_to_hints(analysis)
+    label_keywords = label_hints.keywords
+    label_categories = label_hints.categories
     query_text = request.query or ""
 
     scored = []
@@ -98,6 +101,7 @@ def image_search(request: ImageSearchRequest) -> SearchResponse:
                 ],
             )
             )
+        haystack_lower = haystack.lower()
         text_score = _basic_match_score(query_text, haystack=haystack) if query_text else 0.0
 
         product_colors = set(map(str.lower, product.colors))
@@ -114,10 +118,26 @@ def image_search(request: ImageSearchRequest) -> SearchResponse:
                 brightness_score = 0.15
             elif "mostly_light" in analysis.notes and ("white" in product_colors or "gray" in product_colors):
                 brightness_score = 0.1
+        keyword_matches = [kw for kw in label_keywords if kw in haystack_lower]
+        keyword_score = 0.0
+        if label_keywords:
+            keyword_score = 0.7 * (len(keyword_matches) / len(label_keywords))
+
+        category_score = 0.0
+        if label_categories and product.category and product.category in label_categories:
+            category_score = 0.25
 
         stock_bonus = 0.05 if product.in_stock else -0.05
 
-        score = text_score + color_score + brightness_score + stock_bonus
+        score = (
+            text_score
+            + color_score
+            + brightness_score
+            + keyword_score
+            + category_score
+            + stock_bonus
+        )
+
         rationale_parts = []
         if overlap:
             rationale_parts.append(f"color match: {', '.join(overlap)}")
@@ -125,6 +145,10 @@ def image_search(request: ImageSearchRequest) -> SearchResponse:
             rationale_parts.append(f"complements the {color_hints[0]} tones in your image")
         if text_score >= 0.4:
             rationale_parts.append("aligns with your description")
+        if keyword_matches:
+            rationale_parts.append(f"looks like {keyword_matches[0]}")
+        elif category_score > 0 and label_categories:
+            rationale_parts.append(f"similar {label_categories[0]} item")
         if not rationale_parts and product.tags:
             rationale_parts.append(product.tags[0])
 
@@ -142,4 +166,8 @@ def image_search(request: ImageSearchRequest) -> SearchResponse:
     debug = {"matched": len(cards)}
     if analysis:
         debug["image_analysis"] = analysis.to_dict()
+    if color_hints:
+        debug["color_hints"] = color_hints
+    if label_keywords or label_categories:
+        debug["label_hints"] = label_hints.to_dict()
     return SearchResponse(results=cards, debug=debug)
