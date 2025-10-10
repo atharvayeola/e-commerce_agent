@@ -1,0 +1,3 @@
+# Root requirements for Render convenience
+# Delegate to the actual API requirements
+-r apps/api/requirements.txt
