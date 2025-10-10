@@ -57,16 +57,7 @@ export default function ProductGrid({ products }: { products: ProductCard[] }) {
               )}
             </div>
 
-            {product.image && (
-              <div className="mt-3 aspect-[4/3] w-full overflow-hidden rounded-lg bg-slate-100">
-                <img
-                  src={product.image}
-                  alt={product.title}
-                  className="h-full w-full object-cover"
-                  loading="lazy"
-                />
-              </div>
-            )}
+            {/* Image removed per request: show text-only product cards */}
 
             <p className="mt-1 text-sm text-slate-600">{formatPrice(product.price_cents, product.currency)}</p>
             {categoryLabel && (
