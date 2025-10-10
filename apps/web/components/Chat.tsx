@@ -4,7 +4,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { AgentResponse } from "../lib/types";
 import { sendAgentMessage } from "../lib/agentClient";
-import { DEFAULT_BROWSE_AI_EXTRACTOR } from "/Users/ayeola/Downloads/test_agent/apps/web/lib/config";
+import { DEFAULT_BROWSE_AI_EXTRACTOR } from "../lib/config";
 
 export type ChatMessage = {
   id: string;
