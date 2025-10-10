@@ -3,7 +3,11 @@ import { AgentResponse } from "./types";
 
 // The backend exposes endpoints at the root (e.g. http://localhost:8000/agent/chat).
 // Default to the backend root so the client works when running uvicorn locally.
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8000";
+// Treat empty string as unset (Vercel can pass empty values) and normalize trailing slashes.
+const _envApiBase = process.env.NEXT_PUBLIC_API_BASE;
+const API_BASE = _envApiBase && _envApiBase.trim()
+  ? _envApiBase.trim().replace(/\/+$/, "")
+  : "http://localhost:8000";
 
 export type AgentMessageOptions = {
   image_b64?: string;
@@ -30,14 +34,20 @@ export async function sendAgentMessage(
     // No API key forwarded from client; backend will read BROWSEAI_API_KEY.
   }
 
-  const response = await fetch(`${API_BASE}/agent/chat`, {
+  const url = `${API_BASE}/agent/chat`;
+  const response = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
 
   if (!response.ok) {
-    throw new Error(`Agent request failed with status ${response.status}`);
+    let detail = "";
+    try {
+      const text = await response.text();
+      detail = text ? ` - ${text.slice(0, 200)}` : "";
+    } catch {}
+    throw new Error(`Agent request failed with status ${response.status} ${response.statusText} at ${url}${detail}`);
   }
 
   return (await response.json()) as AgentResponse;
