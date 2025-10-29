@@ -10,6 +10,7 @@ An end-to-end e-commerce agent:
 ## TL;DR
 
 - Local catalog: 50 products across 10 categories (electronics, home-appliance, kitchenware, outdoor, fitness, beauty, toys, books, fashion, office)
+- Retrieval: LangChain + LangGraph RAG (SentenceTransformer embeddings, optional OpenAI answer) with on-the-fly web enrichment and deterministic lexical fallback
 - Image analysis: optional ViT classifier + captioning, distilled into keywords/categories for ranking
 - Web enrichment: built-in web fetcher; Browse.ai adapter available but currently blocked by extractor 403s for the shared IDs
 - Frontend: clean chat UI; result cards are currently text-only (we removed thumbnails by request)
@@ -30,7 +31,7 @@ docker-compose.yml   # Optional local stack
 
 1) Chat comes in to `/agent/chat` with either text, an image, or both.
 2) The agent classifies intent (smalltalk, text_recommendation, image_search).
-3a) Text flow → searches the in-memory catalog deterministically (token overlap) and returns ProductCards.
+3a) Text flow → runs a LangChain/LangGraph RAG pass (SentenceTransformer vector search, optional LLM summary) over the catalog, enriches with embedded web product results, and falls back to deterministic token-overlap scoring if disabled.
 3b) Image flow → analyzes the image (colors, brightness, aspect, optional object labels + caption) and converts to label/category “hints”; these contribute to scoring against the same catalog.
 4) Optional web enrichment → if allowed, fetches a page or falls back to a search, extracts OG/JSON-LD into product-like cards. These appear with source badges.
 
@@ -40,6 +41,7 @@ Everything is intentionally simple and deterministic so it runs reliably without
 
 - `apps/api/routers/agent.py` – Orchestrates the chat flow, calling catalog search or image search and optionally web/Browse.ai.
 - `apps/api/routers/catalog.py` – Provides `/catalog/search` and `/catalog/image-search` using the demo dataset.
+- `apps/api/core/rag_pipeline.py` – LangChain/LangGraph RAG wrapper for the catalog (SentenceTransformer embeddings + optional LLM answer).
 - `apps/api/core/image_analysis.py` – Image analysis helpers: color extraction, brightness, optional ViT labels and BLIP captions; maps to label hints.
 - `apps/api/core/web_fetch.py` – Safe web fetcher with allowlist/allow-all, OG + JSON-LD extraction, and product-card shaping.
 - `apps/api/core/browseai_adapter.py` – Server-side Browse.ai extractor call + polling (403 observed for shared extractor IDs).
@@ -82,6 +84,11 @@ Backend env vars:
 - `BROWSEAI_API_KEY` – Server-only key for Browse.ai. Do not expose to client.
 - `ENABLE_IMAGE_CLASSIFIER` – `1` to enable the ViT object labels pipeline.
 - `ENABLE_IMAGE_CAPTIONING` – `1` to enable BLIP captioning (default on when transformers available).
+- `ENABLE_LANGCHAIN_RAG` – Defaults to `1`. Set to `0` to stick with lexical retrieval only.
+- `RAG_EMBED_MODEL` – SentenceTransformer model to embed the catalog (`all-MiniLM-L6-v2` by default).
+- `RAG_OPENAI_MODEL` – Optional chat model for RAG answer text (requires `OPENAI_API_KEY`).
+- `ENABLE_RAG_WEB` – Defaults to `1`. Disable to skip embedding web results alongside the catalog.
+- `RAG_WEB_LIMIT` – Number of web products to fetch/embed per query (default `4`).
 
 Frontend env vars:
 - `NEXT_PUBLIC_API_BASE` – API base URL.
@@ -94,11 +101,17 @@ It returns a compact shape the frontend can render consistently:
 - description (short), badges (e.g., brand), rationale (why it matched)
 - source (catalog/web/browseai), url (when web-sourced)
 
+When LangChain RAG web enrichment is enabled, `/recommend` responses also include
+`external_results` containing the embedded web cards alongside the catalog
+`results`. These use the same `ProductCard` shape so the frontend can render or
+label them separately.
+
 The grid currently hides `image` by design; re-enable it by restoring the `<img>` block in `ProductGrid.tsx`.
 
 ## Design choices and what we tried
 
-- Deterministic scoring first: We chose token-overlap and simple heuristics to keep responses stable and debuggable without external dependencies.
+- Deterministic scoring first (with optional RAG): LangChain/LangGraph RAG is enabled by default, but if embeddings fail or are disabled we revert to the original token-overlap heuristics for reliability.
+- LangChain/LangGraph RAG: We embed the catalog with SentenceTransformer (`all-MiniLM-L6-v2`), retrieve via a LangGraph state machine, optionally let an OpenAI chat model write a short rationale, and now embed a handful of web results in the same vector space for blended context. The rest of the scoring stack (filters/diversity) still runs locally.
 - Label-to-hints mapping: Image labels (and caption tokens) get mapped to domain keywords/categories so the same catalog scoring works for text and image.
 - Server-side Browse.ai: We moved the key to the server and normalized to our ProductCard shape. However, shared extractor IDs returned 403s in our tests; integration remains in place pending correct credentials.
 - Web fetch safety: The allowlist + allow-all toggle provides safe defaults while enabling demos. OG/JSON-LD extraction often yields clean product metadata; we surface price, brand, images when available.
@@ -106,7 +119,7 @@ The grid currently hides `image` by design; re-enable it by restoring the `<img>
 - Images on/off: We generated deterministic local thumbnails at one point, then rolled back. The grid now renders text-only for cleaner demos without misleading visuals. You can flip this anytime.
 
 Not yet or deferred:
-- Vector DB + re-ranking (pgvector/FAISS) – planned; stubs are structured to make this swap straightforward.
+- Persistent external vector DB (pgvector/FAISS) – the current RAG uses an in-process index; wiring it to pgvector is still future work.
 - Robust SERP and scraping – DuckDuckGo HTML fallback and basic extraction are demo-only.
 - A unified text-to-hints function – considered to align text and image flows; can be introduced behind a flag without changing the public API.
 - Classifier model weights in production – enabling ViT/BLIP requires `transformers`; we gate it via env vars to keep cold starts small.
@@ -150,5 +163,3 @@ curl -X POST http://127.0.0.1:8000/agent/chat \
   -H 'Content-Type: application/json' \
   -d '{"message":"espresso grinder under 200","allow_web":true}'
 ```
-
-

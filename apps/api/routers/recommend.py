@@ -13,7 +13,7 @@ from typing import Dict, Iterable, List
 from fastapi import APIRouter
 
 from ..core.dataset import Product, filter_products, load_catalog
-from ..core.retriever import retrieve_candidates, cross_encoder_rerank
+from ..core.retriever import retrieve_candidates, cross_encoder_rerank, get_last_rag_result
 from ..schemas import ProductCard, RecommendRequest, SearchResponse
 
 router = APIRouter()
@@ -182,4 +182,17 @@ def recommend_products(request: RecommendRequest) -> SearchResponse:
         "max_baseline": max_baseline,
         "fallback_used": bool(scored and not max_baseline),
     }
-    return SearchResponse(results=cards, debug=debug)
+
+    rag_result = get_last_rag_result()
+    external_cards: List[ProductCard] = []
+    if rag_result:
+        debug["rag"] = {
+            "enabled": True,
+            "summary": rag_result.answer,
+            "references": rag_result.references[:5],
+        }
+        if rag_result.web_cards:
+            external_cards = rag_result.web_cards[: request.limit]
+    else:
+        debug["rag"] = {"enabled": False}
+    return SearchResponse(results=cards, external_results=external_cards, debug=debug)

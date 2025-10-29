@@ -59,6 +59,7 @@ class RecommendRequest(BaseModel):
 
 class SearchResponse(BaseModel):
     results: List[ProductCard] = Field(default_factory=list)
+    external_results: List[ProductCard] = Field(default_factory=list)
     debug: dict = Field(default_factory=dict)
 
 

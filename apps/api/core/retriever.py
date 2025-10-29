@@ -8,11 +8,23 @@ missing.
 """
 from __future__ import annotations
 
-from typing import List
+from typing import Any, List, Optional, TYPE_CHECKING
 import os
 import logging
 
 from ..core.dataset import load_catalog, Product
+
+if TYPE_CHECKING:  # pragma: no cover - import only for type checkers
+    from .rag_pipeline import CatalogRAGResult as CatalogRAGResultType
+else:  # pragma: no cover - runtime fallback when typing is not required
+    CatalogRAGResultType = Any
+
+try:
+    from .rag_pipeline import get_catalog_rag
+except Exception:  # pragma: no cover - optional dependency guard
+    get_catalog_rag = lambda: None  # type: ignore
+
+_last_rag_result: Optional[CatalogRAGResultType] = None
 
 
 def _lexical_retrieve(goal: str, limit: int = 50) -> List[Product]:
@@ -50,6 +62,22 @@ def retrieve_candidates(goal: str, limit: int = 50) -> List[Product]:
       limit candidates and let the reranker optionally refine ordering.
     - Otherwise fall back to simple lexical retrieval.
     """
+    global _last_rag_result
+
+    # Prefer LangChain/LangGraph RAG when available and enabled.
+    rag_service = get_catalog_rag()
+    if rag_service:
+        try:
+            rag_result = rag_service.run(goal, top_k=limit)
+        except Exception as exc:  # pragma: no cover - safety net for runtime failures
+            logging.exception("RAG retrieval failed, falling back to lexical: %s", exc)
+            rag_result = None
+        if rag_result and rag_result.products:
+            _last_rag_result = rag_result
+            return rag_result.products[:limit]
+
+    _last_rag_result = None
+
     # If a Postgres pgvector DSN is provided, try to query nearest neighbors.
     if os.environ.get("PGVECTOR_DSN"):
         try:
@@ -99,3 +127,9 @@ def cross_encoder_rerank(goal: str, candidates: List[Product]) -> List[Product]:
     except Exception:
         # semantic reranker not available; return original order
         return candidates
+
+
+def get_last_rag_result() -> Optional[CatalogRAGResultType]:
+    """Expose the last RAG run result for debugging/telemetry callers."""
+
+    return _last_rag_result
